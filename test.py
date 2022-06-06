@@ -1,5 +1,4 @@
 import random
 
 
-class Creature():
-    pass
+print('hello')
