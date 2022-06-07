@@ -33,7 +33,7 @@ class Creature():
         self.energia = energia
 
     def mate(self, other):
-        """genera un figlio con dizionario dato da un crossover dei dizionari e posizioni casuali"""
+        """genera un figlio con dizionario dato da un crossover dei dizionari genitori e con posizioni casuali"""
         mosse_figlio = crossover(self.mosse, other.mosse)
         return Creature(mosse_figlio)
 
@@ -113,7 +113,7 @@ def crossover(dict1, dict2):
     return {**dict_a,**dict_b}  # accosto i due dictionary e restituisco il risultato
 
 
-def roulette_sampling(list,fit):
+def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondenti
     '''associamo virtualmente all'elemento i-esimo della list la probabilità i-esima di prob'''
     prob=copy.copy(fit)
     prob=prob/np.sum(prob)
@@ -125,7 +125,7 @@ def roulette_sampling(list,fit):
             risultato = list[cum.index(i)]
             return risultato
 
-def get_offsprings(parents, mut_prob):
+def get_offsprings(parents, mut_prob): #lista di creature e prob di mutazione
     '''rimpiazzo tutte le creature con i figli di queste, cioè npop nuove creature.
         le creature figlie hanno come energia la media delle energie dei genitori arrotondata per eccesso.
         nel caso in cui tutte le creature abbiano energia 0, la popolazione si estingue:  lo segnalo.
