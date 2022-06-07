@@ -4,6 +4,7 @@ import numpy as np
 import random
 from numpy import NaN
 import argparse
+import copy
 
 
 NTORTE = 10
@@ -30,6 +31,11 @@ class Creature():
             self.y=y
         
         self.energia = energia
+
+    def mate(self, other):
+        """genera un figlio con dizionario dato da un crossover dei dizionari e posizioni casuali"""
+        mosse_figlio = crossover(self.mosse, other.mosse)
+        return Creature(mosse_figlio)
 
 
 class Ambiente(list):
@@ -89,6 +95,56 @@ def movimento(creatura, ambiente):
         ambiente[x_new][y_new] = 0
 
 
+def crossover(dict1, dict2):
+    """ ad una creatura per essere buona basta quasi solo andare verso una torta quando ce n'è una,
+        per questo motivo ogni crossover va bene, perchè non distruggono mai 
+        l'associazione "se c'è una torta --> ci vado".
+        tuttavia una creatura adatta è anche una creatura che esplora più mappa possibile, cioè torna con bassa
+        probabilità dove è appena stata, per esempio una creatura che va prevalentemente in due direzioni (e va 
+        sulle torte quando ci sono) è migliore di una creatura che quando ci sono più torte si mangia una di queste
+        ma nelle varie combinzioni multitorta usa tutte le direzioni.
+        per questo motivo prendo un quarto del genoma di un genitore e 3/4 dell'altro. Ripeto: 
+        questo perchè se una creatura è buona vuol dire che: va verso le torte quando ci sono (e questo viene
+        mantenuto dalla scelta del crossover) e tende a usare 2 direzioni invece di 4 (con questo crossover
+        rischio meno di trovarmi con le quattro direzioni ben mischiate) """
+    dict_a = { i : dict1[i] for i in POSSIBILITA[0:4] } #il primo quarto da dict1
+    dict_b= { i : dict2[i] for i in POSSIBILITA[4:16] } #il resto da dict2
+
+    return {**dict_a,**dict_b}  # accosto i due dictionary e restituisco il risultato
+
+
+def roulette_sampling(list,fit):
+    '''associamo virtualmente all'elemento i-esimo della list la probabilità i-esima di prob'''
+    prob=copy.copy(fit)
+    prob=prob/np.sum(prob)
+    cum=np.cumsum(prob)
+    cum=cum.tolist()
+    rn=random.random()
+    for i in cum:
+        if rn<i:
+            risultato = list[cum.index(i)]
+            return risultato
+
+def get_offsprings(parents, mut_prob):
+    '''rimpiazzo tutte le creature con i figli di queste, cioè npop nuove creature.
+        le creature figlie hanno come energia la media delle energie dei genitori arrotondata per eccesso.
+        nel caso in cui tutte le creature abbiano energia 0, la popolazione si estingue:  lo segnalo.
+        siccome c'è la possibilità che rimanga solo un genitore con energia non nulla, contemplo la possibilità
+        di mating tra una creatura con sè stessa '''
+     
+    #estraggo i fitness:
+    fit = [creat.energia for creat in parents]
+    
+    #controllo se c'è ancora vita:
+    if fit.sum == 0:
+        print("non ci sono più genitori in vita\n")
+
+    off_springs = []
+    for i in range(npop):
+        parent1 = roulette_sampling(parents, fit)
+        parent2 = roulette_sampling(parents,fit)
+        off_springs.append(parent1.mate(parent2))
+    return off_springs
 
 '''COMMENTI PER AVERE UN'IDEA DI COSA FARE
 -creo la prima generazione di creature
