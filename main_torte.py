@@ -9,7 +9,7 @@ NTORTE = 10
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
-'''come in self.mosse, ad esempio, 0101 significa: dx torta, su niente, sx torta, giù niente'''
+'''come in self.mosse, ad esempio, 0101 significa: dx torta, su niente, sx torta, giù nientee'''
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class Creature():
