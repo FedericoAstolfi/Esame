@@ -69,6 +69,15 @@ class TestMain_Torte(unittest.TestCase):
         hand_made = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
         self.assertEqual(hand_made, main_torte.crossover(dict1, dict2))
     
+    def test_roulette_sampling(self):
+        #genero una lista di tre creature di cui due con energia nulla e controllo che mi estragga il terzo
+        lista = [main_torte.Creature(),main_torte.Creature(), main_torte.Creature()]
+        fit = [c.energia for c in lista]
+
+        #metto l'energia a 0 dei primi due, poi provo anche mettendo molto alta la prima aspettandomi che il test fallisca
+        lista[0].energia = 0
+        lista[1].energia = 0
+        self.assertEqual(lista[2], main_torte.roulette_sampling(lista, fit))
 
 if __name__ == '__main__':
     unittest.main()
