@@ -46,11 +46,11 @@ class Ambiente(list):
         self[random.randint(0,NTORTE-1)][random.randint(0,NTORTE-1)]=1
         #randint prende estremo dx incluso
 
-def move(creatura, ambiente):
+def movimento(creatura, ambiente):
 
-    '''il metodo move prende in input la creatura e l'ambiente in cui essa
+    '''il metodo movimento prende in input la creatura e l'ambiente in cui essa
     si sta muovendo e non returna nulla, ma modifica la posizione e l'energia della
-    creatura ed eventualmente rimuove una torta (si potrebbe chiamare move&eat)'''
+    creatura ed eventualmente rimuove una torta (si potrebbe chiamare moveat)'''
 
     x=creatura.x
     y=creatura.y
@@ -60,7 +60,33 @@ def move(creatura, ambiente):
     #però a me serve come stringa per accedere agli elementi del dizionario
     chiave = "".join([str(item) for item in chiave_list])
 
-    
+    mossa = creatura.mosse[chiave]
+
+    #ora facciamo spostare la creatura a seconda di quello che ha codificato nel genoma
+
+    if mossa == 0:
+        creatura.x = x+1%10
+    elif mossa == 1:
+        creatura.y = y+1%10
+    elif mossa == 2:
+        creatura.x = x-1%10
+    elif mossa == 3:
+        creatura.y = y-1%10
+
+    #ora che la creatura si è spostata, vediamo di fare le modifiche opportune:
+
+    x_new = creatura.x
+    y_new = creatura.y
+
+    #togliamo o lasciamo invariata l'energia e togliamo eventualmente le torte:
+
+    if ambiente[x_new][y_new] == 0:
+        creatura.energia -=1
+        #non modifico ambiente
+    else:
+        #non modifico energia
+        ambiente[x_new][y_new] = 0
+
 
 
 '''COMMENTI PER AVERE UN'IDEA DI COSA FARE
