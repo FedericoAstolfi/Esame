@@ -1,5 +1,6 @@
 import unittest
 import main_torte
+import random
 
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
