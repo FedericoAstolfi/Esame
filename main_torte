@@ -3,10 +3,12 @@
 import random
 from numpy import NaN
 import argparse
+import numpy as np
 
 NTORTE = 10
 ENERGIA = 10
 NGRIGLIA = 10
+NMOSSE = 5
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class Creature():
@@ -27,29 +29,46 @@ class Creature():
         
         self.energia = energia
 
-class Ambiente():
+class Ambiente(list):
 
-    pass
+    '''creo ambiente come figlia della classe list, infatti voglio che sia una matrice. quindi non uso __init__ 
+    ma posso porre definire direttamente self come una matrice. prima la definisco come piena di zeri, poi ci metto
+    degli 1 in posizioni a caso. la condizione sul ciclo è che finchè la sommma di tutti gli elementi non è 10, ovvero
+    fino a quando non ci sono 10 1, il ciclo continua.
+    definendo ambiente già come lista non c'è bisogno di nessun metodo che acceda agli 0 e 1 della matrice, visto che
+    basta fare ambiente[i][j]'''
+
+    self = [[0 for i in range(0,10)] for n in range(0,10)]
+
+    while np.sum(self)<10:
+        self[random.randint(0,NTORTE-1)][random.randint(0,NTORTE-1)]=1
+        #randint prende estremo dx incluso
+
+
+'''COMMENTI PER AVERE UN'IDEA DI COSA FARE
+-creo la prima generazione di creature
+-creo il primo ambiente
+-faccio muovere le creature
+- '''
+    
 
 # PROGRAMMA PRINCIPALE
 
 if __name__=='__main__':
 
-    parser = argparse.ArgumentParser(description = "A program running genetic algorithms")
-    parser.add_argument('ncities', help='number of cities', type=int)
-    parser.add_argument('popsize', help= "Population size", type=int)
-    parser.add_argument('surv_frac', help= "Surviving fraction", type=float)
-    parser.add_argument('mut_prob', help= "Mutation probability", type=float)
-    parser.add_argument('ngen', help= "N of generations", type=int)
+    parser = argparse.ArgumentParser(description = "Istinto di sopravvivenza con algoritmi genetici")
+    parser.add_argument('popsize', help= "Numero di creature", type=int)
+    parser.add_argument('mut_prob', help= "Probabilità di mutazione", type=float)
+    parser.add_argument('ngen', help= "Numero di generazioni", type=int)
     parser.add_argument('--no_plots', help="does not show plots", default=False, action='store_true')
     args = parser.parse_args()
 
     print(args)
 
     npop = args.popsize
-    surv_prob = args.surv_frac
     mut_prob = args.mut_prob
     ngen = args.ngen
-    ncities = args.ncities
+
+    creature = [Creature() for i in range(npop)]
 
         
