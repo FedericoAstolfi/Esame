@@ -14,14 +14,14 @@ POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class Creature():
 
-    def __init__(self, dizionario = None, x=None, y=None, energia = ENERGIA  ):
+    def __init__(self, dizionario = None, x=NaN, y=NaN, energia = ENERGIA  ):
         ''' se non do niente genera delle mosse e delle posizioni casualmente con energia quella iniziale (e anche massima) '''
         if dizionario: #gli ho dato qualche dizionario
             self.mosse = dizionario
         else: #genero casualmente
             self.mosse = {i : random.randint(0, 4) for i in POSSIBILITA} #0 è destra, 1 su, 2 sinistra, 3 giù
 
-        if x==None & y==None: 
+        if not x: 
             self.x=random.randint(0,NGRIGLIA)
             self.y=random.randint(0,NGRIGLIA)
         else:
@@ -56,7 +56,7 @@ def movimento(creatura, ambiente):
     y=creatura.y
     
     #chiave_list contiene gli elementi limitrofi in ambiente alla posizione che occupa creatura
-    chiave_list = [ambiente[x+1%10][y], ambiente[x][y+1%10], ambiente[x-1%10][y], ambiente[x][y-1%10]]
+    chiave_list = [ambiente[(x+1)%10][y], ambiente[x][(y+1)%10], ambiente[(x-1)%10][y], ambiente[x][(y-1)%10]]
     #però a me serve come stringa per accedere agli elementi del dizionario
     chiave = "".join([str(item) for item in chiave_list])
 
@@ -65,13 +65,13 @@ def movimento(creatura, ambiente):
     #ora facciamo spostare la creatura a seconda di quello che ha codificato nel genoma
 
     if mossa == 0:
-        creatura.x = x+1%10
+        creatura.x = (x+1)%10
     elif mossa == 1:
-        creatura.y = y+1%10
+        creatura.y = (y+1)%10
     elif mossa == 2:
-        creatura.x = x-1%10
+        creatura.x = (x-1)%10
     elif mossa == 3:
-        creatura.y = y-1%10
+        creatura.y = (y-1)%10
 
     #ora che la creatura si è spostata, vediamo di fare le modifiche opportune:
 
