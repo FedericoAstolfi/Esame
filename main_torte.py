@@ -1,9 +1,10 @@
 # Esame di Algoritmi Genetici
 
+import numpy as np
 import random
 from numpy import NaN
 import argparse
-import numpy as np
+
 
 NTORTE = 10
 ENERGIA = 10
