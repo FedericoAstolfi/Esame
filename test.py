@@ -6,11 +6,11 @@ POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class TestMain_Torte(unittest.TestCase):
 
-    def setUp(self):
+    """def setUp(self):
         print('before')
 
     def tearDown(self):
-        print('after')
+        print('after')"""
 
     def test_movimento(self):
 
@@ -59,8 +59,16 @@ class TestMain_Torte(unittest.TestCase):
         self.assertEqual(griglia[5][0], 0)
 
         '''anche questo funziona, DA PENSARE SE PUO' AVERE SENSO FARE DEI TEST PIU' MIRATI'''
-
-
+    
+    def test_crossover(self):
+        
+        """test del crossover 1/4 + 3/4"""
+        #genero due dict casualmente {i : random.randint(0, 4) for i in POSSIBILITA}
+        dict1  = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 2, '0101': 4, '0110': 0, '0111': 4, '1000': 2, '1001': 4, '1010': 0, '1011': 4, '1100': 4, '1101': 4, '1110': 1, '1111': 0}
+        dict2 = {'0000': 3, '0001': 4, '0010': 1, '0011': 3, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
+        hand_made = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
+        self.assertEqual(hand_made, main_torte.crossover(dict1, dict2))
+    
 
 if __name__ == '__main__':
     unittest.main()
