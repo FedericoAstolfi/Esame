@@ -9,6 +9,7 @@ NTORTE = 10
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
+'''come in self.mosse, ad esempio, 0101 significa: dx torta, su niente, sx torta, giù niente'''
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class Creature():
@@ -29,26 +30,45 @@ class Creature():
         
         self.energia = energia
 
+
 class Ambiente(list):
 
     '''creo ambiente come figlia della classe list, infatti voglio che sia una matrice. quindi non uso __init__ 
     ma posso porre definire direttamente self come una matrice. prima la definisco come piena di zeri, poi ci metto
-    degli 1 in posizioni a caso. la condizione sul ciclo è che finchè la sommma di tutti gli elementi non è 10, ovvero
-    fino a quando non ci sono 10 1, il ciclo continua.
+    degli 1 in posizioni a caso. la condizione sul ciclo è che finchè la sommma di tutti gli elementi non è NTORTE, ovvero
+    fino a quando non ci sono NTORTE 1, il ciclo continua.
     definendo ambiente già come lista non c'è bisogno di nessun metodo che acceda agli 0 e 1 della matrice, visto che
     basta fare ambiente[i][j]'''
 
-    self = [[0 for i in range(0,10)] for n in range(0,10)]
+    self = [[0 for i in range(0,NGRIGLIA)] for n in range(0,NGRIGLIA)]
 
-    while np.sum(self)<10:
+    while np.sum(self)<NTORTE:
         self[random.randint(0,NTORTE-1)][random.randint(0,NTORTE-1)]=1
         #randint prende estremo dx incluso
+
+def move(creatura, ambiente):
+
+    '''il metodo move prende in input la creatura e l'ambiente in cui essa
+    si sta muovendo e non returna nulla, ma modifica la posizione e l'energia della
+    creatura ed eventualmente rimuove una torta (si potrebbe chiamare move&eat)'''
+
+    x=creatura.x
+    y=creatura.y
+    
+    #chiave_list contiene gli elementi limitrofi in ambiente alla posizione che occupa creatura
+    chiave_list = [ambiente[x+1%10][y], ambiente[x][y+1%10], ambiente[x-1%10][y], ambiente[x][y-1%10]]
+    #però a me serve come stringa per accedere agli elementi del dizionario
+    chiave = "".join([str(item) for item in chiave_list])
+
+    
 
 
 '''COMMENTI PER AVERE UN'IDEA DI COSA FARE
 -creo la prima generazione di creature
 -creo il primo ambiente
--faccio muovere le creature
+-faccio muovere le creature (come? creo tipo un metodo move() ?)
+-definisco qualcosa che rimuove gli 1 delle torte quando una creatura ci passa
+-definisco qualcosa che a ogni mossa toglie 1 di energia oppure non toglie nulla alla creatura
 - '''
     
 
@@ -70,5 +90,7 @@ if __name__=='__main__':
     ngen = args.ngen
 
     creature = [Creature() for i in range(npop)]
+    ambiente = Ambiente()
+
 
         
