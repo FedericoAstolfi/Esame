@@ -138,12 +138,21 @@ def get_offsprings(parents, mut_prob): #lista di creature e prob di mutazione
     #controllo se c'è ancora vita:
     if fit.sum == 0:
         print("non ci sono più genitori in vita\n")
+        quit()
+    
 
     off_springs = []
     for i in range(npop):
+        
         parent1 = roulette_sampling(parents, fit)
         parent2 = roulette_sampling(parents,fit)
-        off_springs.append(parent1.mate(parent2))
+        if parent1.mosse != parent2.mosse:    #se ho preso due parenti diversi li tengo e accoppio
+            off_springs.append(parent1.mate(parent2))
+        else:           #altrimenti continuo finchè non sono diversi
+            while parent1.mosse == parent2.mosse:
+                parent1 = roulette_sampling(parents, fit)
+            off_springs.append(parent1.mate(parent2))
+        
     return off_springs
 
 '''COMMENTI PER AVERE UN'IDEA DI COSA FARE
