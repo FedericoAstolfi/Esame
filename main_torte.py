@@ -38,6 +38,9 @@ class Creature():
         return Creature(mosse_figlio)
 
 
+'''facciamo che per ora lascio stare la classe ambiente, ma al suo posto uso una semplice
+matrice che mi definisco a mano ogni volta nel main: non dovrebbe essere troppo una sbatta'''
+
 class Ambiente(list):
 
     '''creo ambiente come figlia della classe list, infatti voglio che sia una matrice. quindi non uso __init__ 
@@ -47,11 +50,13 @@ class Ambiente(list):
     definendo ambiente già come lista non c'è bisogno di nessun metodo che acceda agli 0 e 1 della matrice, visto che
     basta fare ambiente[i][j]'''
 
-    self = [[0 for i in range(0,NGRIGLIA)] for n in range(0,NGRIGLIA)]
+    def __init__():
 
-    while np.sum(self)<NTORTE:
-        self[random.randint(0,NTORTE-1)][random.randint(0,NTORTE-1)]=1
-        #randint prende estremo dx incluso
+        self = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
+
+        while np.sum(self)<NTORTE:
+            self[random.randint(0, NTORTE-1)][random.randint(0, NTORTE-1)]=1
+            #randint prende estremo dx incluso
 
 def movimento(creatura, ambiente):
 
@@ -189,18 +194,21 @@ if __name__=='__main__':
     mut_prob = args.mut_prob
     ngen = args.ngen
 
-    creature = [Creature() for i in range(npop)]  #creo prima popolazione con mosse e coord random
-    ambiente = Ambiente()                          #creo un ambiente random
+    #creo prima popolazione con mosse e coord random:
+    creature = [Creature() for i in range(npop)]  
 
-    print(ambiente)
+    #creo un ambiente random:
+    ambiente = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
+    while np.sum(ambiente)<NTORTE:
+        ambiente[random.randint(0, NTORTE-1)][random.randint(0, NTORTE-1)]=1
 
     """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
     #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
     for c in creature:
         print(c.x, c.y)
-        """if ambiente[c.x][c.y] == 1 :
+        if ambiente[c.x][c.y] == 1 :
             c.energia += 1      #incremento energia del fortunato
-            ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente"""
+            ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
     
     for i in range(NMOSSE):
         for c in creature:
