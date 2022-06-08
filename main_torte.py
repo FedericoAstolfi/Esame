@@ -1,6 +1,5 @@
 # Esame di Algoritmi Genetici
 
-from ctypes import create_unicode_buffer
 import numpy as np
 import random
 from numpy import NaN
