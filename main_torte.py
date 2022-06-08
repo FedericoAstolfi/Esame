@@ -5,12 +5,13 @@ import random
 from numpy import NaN
 import argparse
 import copy
+import matplotlib.pyplot as plt
 
 
 NTORTE = 10
 ENERGIA = 10
 NGRIGLIA = 10
-NMOSSE = 5
+NMOSSE = 1
 '''come in self.mosse, ad esempio, 0101 significa: dx torta, su niente, sx torta, giù nientee'''
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
@@ -176,6 +177,58 @@ def get_offsprings(parents, mut_prob): #lista di creature e prob di mutazione
 -definisco qualcosa che a ogni mossa toglie 1 di energia oppure non toglie nulla alla creatura
 - '''
     
+def plot_creature(popolazione, ambiente):
+    
+    '''
+    -come lo zaro ha fatto in gencolors, mi sembrava sensato usare un metodo che si occupasse dei plot
+    -chiamo questo metodo dopo che ho creato fig, ax = plt.subplot(), che in sostanza è una lista di grafici.
+    la prima azione che fa è pulire la lista, altrimenti ogni volta che la creatura fa una mossa, nel plot rimane 
+    anche il percorso che ha fatto.
+    -i pallini sono le torte e le x le creature
+    -quello che inizia a fare è creare delle liste con ascisse e ordinate delle torte per poi plottarle (QUESTO LO FA GIUSTO, PERO' 
+    NOTA CHE HO SOSTITUITO LA ORDINATA DELLE TORTE CON (NGRIGLIA - ORDINATA) PERCHE' ALTRIMENTI TUTTA LA PRIMA RIGA DELLA 
+    MATRICE (CHE IN AMBIENTE DOVREBBE ESSERE MESSA AL LIVELLO DI ORDINATA 9) VERRREBBE MESSA AL LIVELLO DI ORDINATA 0, LA SECONDA RIGA
+    VERREBBE MESSA AL LIVELLO 1 INVECE CHE ALL'8 E COSI VIA...)
+    -
+    '''
+
+    ax.clear()
+
+    torta_x = []
+    torta_y = []
+    for i in range(NGRIGLIA):
+        for j in range(NGRIGLIA):
+            if ambiente[i][j] == 1:
+                '''scambio le coordinate perchè la prima mi dà la riga e la seconda la colonna
+                quindi la prima mi dà l'ordinata e la seconda l'ascissa
+                inoltre devo stare attento perchè gli elementi in teoria sono distribuiti così:
+                [0][0] [0][1] [0][2]
+                [1][0] [1][1] [1][2]
+                [2][0] [2][1] [2][2]'''
+
+                torta_x += [j]
+                torta_y += [NGRIGLIA -1 - i]
+
+    ax.set_xlim(-0.5, 9.5)
+    ax.set_ylim(-0.5, 9.5)
+    my_ticks = range(10) #crea degli sticker che sotto appiccico sull'asse delle x e delle y
+    plt.xticks(my_ticks)
+    plt.yticks(my_ticks)
+    '''sta boomerata degli sticker l'ho fatta perchè altrimenti python è stupido e mi mette il reticolo della griglia 
+    a  0 2 4 6 8, mentre io voglio che mi metta una linea per ogni numero 0 1 2 3 4 5 ...
+    se non mi sono spiegato prova a commentare momentaneamente myticks e plt.xtricks plt.yticks'''
+    ax.scatter(torta_x, torta_y, color = 'b') #plotto i punti con scatter
+    plt.grid(linewidth=0.5, color = 'g', linestyle = '--') #tiro su una griglia 
+
+    for i in range(len(creature)): #printo tutte le creature, che vengono messe nella loro posizione iniziale giusta
+        ax.scatter(creature[i].x, creature[i].y, color = 'r', marker = 'x')
+        
+    
+
+
+    
+
+
 
 # PROGRAMMA PRINCIPALE
 
@@ -200,7 +253,8 @@ if __name__=='__main__':
     #creo un ambiente random:
     ambiente = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
     while np.sum(ambiente)<NTORTE:
-        ambiente[random.randint(0, NTORTE-1)][random.randint(0, NTORTE-1)]=1
+        ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]=1
+    print(ambiente)
 
     """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
     #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
@@ -210,11 +264,38 @@ if __name__=='__main__':
             c.energia += 1      #incremento energia del fortunato
             ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
     
-    for i in range(NMOSSE):
+    '''proviamo a creare un grafico rozzo'''
+
+
+    fig, ax = plt.subplots() #creo la mia lista di plot
+    
+    for i in range(NMOSSE): #faccio muovere le creature della prima generazione
+
+        plot_creature(creature, ambiente)
+        plt.title('prima generazione')
+        
         for c in creature:
+
             movimento(c, ambiente)
 
-   
+        plt.pause(1) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+
+        plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
+
+
+    
+    plt.show()
 
 
         
+'''dobbiamo ricordarci di assicurarci che le creature non possano avere energia negativa'''
+
+'''DOBBIAMO CAMBIARE UNA COSA IMPORTANTE: NELLA CHIAVE DELLE MOSSE
+DELLA CREATURA NON ABBIAMO TENUTO CONTO CHE IN UNA MATRICE, SE PRENDO
+[I][J], ALLORA I INDICA L'ORDINATA E J L'ASCISSA. NE HO TENUTO CONTO PER
+PLOTTRE LE TORTE E LA POSIZIONE INIZIALE DELLA CREATURA, MA NEL METODO 
+MOVIMENTO NON NE AVEVO TENUTO CONTO, QUINDI PER VEDERE COSA C'è AD ESEMPIO
+A DX DELLA CREATURA DEVO GUARDARE L'ELEMENTO [I][J+1], NON IL [I+1][J]
+IN MODO SIMILE RAGIONIAMO SUL FATTO CHE HO 'RIBALTATO' LE COORDINATE DELLA 
+MATRICE PER METTERLA BENE ALL'INTERNO DEL GRAFICO E CHE QUINDI FORSE DOBBIAMO
+RIBALTARE ANCHE I MOVIMENTI SU E GIU DELLA CREATURA'''
