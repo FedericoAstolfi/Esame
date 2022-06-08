@@ -72,13 +72,10 @@ class TestMain_Torte(unittest.TestCase):
     def test_roulette_sampling(self):
         #genero una lista di tre creature di cui due con energia nulla e controllo che mi estragga il terzo
         lista = [main_torte.Creature(),main_torte.Creature(), main_torte.Creature()]
-        fit = [c.energia for c in lista]
-
         #metto l'energia a 0 dei primi due, poi provo anche mettendo molto alta la prima aspettandomi che il test fallisca
         lista[0].energia = 0
         lista[1].energia = 0
-        for i in range(len(lista)):
-            print(lista[i].energia)
+        fit = [c.energia for c in lista]
         self.assertEqual(lista[2], main_torte.roulette_sampling(lista, fit))
     
     """def test_mate(self):
@@ -89,8 +86,13 @@ class TestMain_Torte(unittest.TestCase):
         c2 = main_torte.Creature(dict2)
         #controllo di aver costruito bene le creature:
         self.assertEqual(dict1, c1.mosse)
-        self.assertEqual(dict2, c2.mosse)"""
-        
+        self.assertEqual(dict2, c2.mosse)
+        dic_figlio = {'0000': 0, '0001': 0, '0010': 2, '0011': 1, '0100': 2, '0101': 3, '0110': 1, '0111': 2, '1000': 4, '1001': 4, '1010': 0, '1011': 2, '1100': 3, '1101': 2, '1110': 1, '1111': 2}
+        figlio = main_torte.Creature(dic_figlio, 2, 2)
+        ris = c1.mate(c2)
+        ris.x= 2
+        ris.y= 2
+        self.assertEqual(figlio, ris)"""        
 
 
 if __name__ == '__main__':
