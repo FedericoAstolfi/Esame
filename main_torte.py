@@ -17,16 +17,16 @@ POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class Creature():
 
-    def __init__(self, dizionario = None, x=NaN, y=NaN, energia = ENERGIA  ):
+    def __init__(self, dizionario = None, x=None, y=None, energia = ENERGIA  ):
         ''' se non do niente genera delle mosse e delle posizioni casualmente con energia quella iniziale (e anche massima) '''
         if dizionario: #gli ho dato qualche dizionario
             self.mosse = dizionario
         else: #genero casualmente
-            self.mosse = {i : random.randint(0, 4) for i in POSSIBILITA} #0 è destra, 1 su, 2 sinistra, 3 giù
+            self.mosse = {i : random.randint(0, 3) for i in POSSIBILITA} #0 è destra, 1 su, 2 sinistra, 3 giù
 
         if not x: 
-            self.x=random.randint(0,NGRIGLIA)
-            self.y=random.randint(0,NGRIGLIA)
+            self.x=random.randint(0,NGRIGLIA-1)
+            self.y=random.randint(0,NGRIGLIA-1)
         else:
             self.x=x
             self.y=y
@@ -193,16 +193,20 @@ if __name__=='__main__':
     creature = [Creature() for i in range(npop)]  #creo prima popolazione con mosse e coord random
     ambiente = Ambiente()                          #creo un ambiente random
 
+    print(ambiente)
+
     """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
     #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
     for c in creature:
-        if ambiente[c.x][c.y] == 1 :
+        print(c.x, c.y)
+        """if ambiente[c.x][c.y] == 1 :
             c.energia += 1      #incremento energia del fortunato
-            ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
+            ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente"""
     
     for i in range(NMOSSE):
         for c in creature:
             movimento(c, ambiente)
+
    
 
 
