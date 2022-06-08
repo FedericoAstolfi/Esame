@@ -203,7 +203,7 @@ if __name__=='__main__':
     for i in range(NMOSSE):
         for c in creature:
             movimento(c, ambiente)
-
+   
 
 
         
