@@ -1,5 +1,6 @@
 # Esame di Algoritmi Genetici
 
+from ctypes import create_unicode_buffer
 import numpy as np
 import random
 from numpy import NaN
@@ -58,41 +59,42 @@ def movimento(creatura, ambiente):
     '''il metodo movimento prende in input la creatura e l'ambiente in cui essa
     si sta muovendo e non returna nulla, ma modifica la posizione e l'energia della
     creatura ed eventualmente rimuove una torta (si potrebbe chiamare moveat)'''
+    if creatura.energia > 0: #controllo che abbia energia per muoversi
 
-    x=creatura.x
-    y=creatura.y
-    
-    #chiave_list contiene gli elementi limitrofi in ambiente alla posizione che occupa creatura
-    chiave_list = [ambiente[(x+1)%10][y], ambiente[x][(y+1)%10], ambiente[(x-1)%10][y], ambiente[x][(y-1)%10]]
-    #però a me serve come stringa per accedere agli elementi del dizionario
-    chiave = "".join([str(item) for item in chiave_list])
+        x=creatura.x
+        y=creatura.y
+        
+        #chiave_list contiene gli elementi limitrofi in ambiente alla posizione che occupa creatura
+        chiave_list = [ambiente[(x+1)%10][y], ambiente[x][(y+1)%10], ambiente[(x-1)%10][y], ambiente[x][(y-1)%10]]
+        #però a me serve come stringa per accedere agli elementi del dizionario
+        chiave = "".join([str(item) for item in chiave_list])
 
-    mossa = creatura.mosse[chiave]
+        mossa = creatura.mosse[chiave]
 
-    #ora facciamo spostare la creatura a seconda di quello che ha codificato nel genoma
+        #ora facciamo spostare la creatura a seconda di quello che ha codificato nel genoma
 
-    if mossa == 0:
-        creatura.x = (x+1)%10
-    elif mossa == 1:
-        creatura.y = (y+1)%10
-    elif mossa == 2:
-        creatura.x = (x-1)%10
-    elif mossa == 3:
-        creatura.y = (y-1)%10
+        if mossa == 0:
+            creatura.x = (x+1)%10
+        elif mossa == 1:
+            creatura.y = (y+1)%10
+        elif mossa == 2:
+            creatura.x = (x-1)%10
+        elif mossa == 3:
+            creatura.y = (y-1)%10
 
-    #ora che la creatura si è spostata, vediamo di fare le modifiche opportune:
+        #ora che la creatura si è spostata, vediamo di fare le modifiche opportune:
 
-    x_new = creatura.x
-    y_new = creatura.y
+        x_new = creatura.x
+        y_new = creatura.y
 
-    #togliamo o lasciamo invariata l'energia e togliamo eventualmente le torte:
+        #togliamo o lasciamo invariata l'energia e togliamo eventualmente le torte:
 
-    if ambiente[x_new][y_new] == 0:
-        creatura.energia -=1
-        #non modifico ambiente
-    else:
-        #non modifico energia
-        ambiente[x_new][y_new] = 0
+        if ambiente[x_new][y_new] == 0:
+            creatura.energia -=1
+            #non modifico ambiente
+        else:
+            #non modifico energia
+            ambiente[x_new][y_new] = 0
 
 
 def crossover(dict1, dict2):
@@ -134,25 +136,32 @@ def get_offsprings(parents, mut_prob): #lista di creature e prob di mutazione
      
     #estraggo i fitness:
     fit = [creat.energia for creat in parents]
+    max = max(fit)
     
     #controllo se c'è ancora vita:
     if fit.sum == 0:
-        print("non ci sono più genitori in vita\n")
+        print("La popolazione si è estinta\n")
         quit()
+    
     
 
     off_springs = []
-    for i in range(npop):
-        
-        parent1 = roulette_sampling(parents, fit)
-        parent2 = roulette_sampling(parents,fit)
-        if parent1.mosse != parent2.mosse:    #se ho preso due parenti diversi li tengo e accoppio
-            off_springs.append(parent1.mate(parent2))
-        else:           #altrimenti continuo finchè non sono diversi
-            while parent1.mosse == parent2.mosse:
-                parent1 = roulette_sampling(parents, fit)
-            off_springs.append(parent1.mate(parent2))
-        
+    #se è rimasto solo un genitore devo accettare che si riproduca con sè stesso, cosa che altrimenti evito
+    if fit.count(0) == npop -1:
+        off_springs = [parents[fit.index(max)] for i in range(0, npop)]
+    
+    else:
+        for i in range(npop):
+            
+            parent1 = roulette_sampling(parents, fit)
+            parent2 = roulette_sampling(parents,fit)
+            if parent1.mosse != parent2.mosse:    #se ho preso due parenti diversi li tengo e accoppio
+                off_springs.append(parent1.mate(parent2))
+            else:           #altrimenti continuo finchè non sono diversi
+                while parent1.mosse == parent2.mosse:
+                    parent1 = roulette_sampling(parents, fit)
+                off_springs.append(parent1.mate(parent2))
+            
     return off_springs
 
 '''COMMENTI PER AVERE UN'IDEA DI COSA FARE
@@ -181,8 +190,20 @@ if __name__=='__main__':
     mut_prob = args.mut_prob
     ngen = args.ngen
 
-    creature = [Creature() for i in range(npop)]
-    ambiente = Ambiente()
+    creature = [Creature() for i in range(npop)]  #creo prima popolazione con mosse e coord random
+    ambiente = Ambiente()                          #creo un ambiente random
+
+    """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
+    #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
+    for c in creature:
+        if ambiente[c.x][c.y] == 1 :
+            c.energia += 1      #incremento energia del fortunato
+            ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
+    
+    for i in range(NMOSSE):
+        for c in creature:
+            movimento(c, ambiente)
+
 
 
         
