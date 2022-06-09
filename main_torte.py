@@ -293,7 +293,7 @@ if __name__=='__main__':
 
                 movimento(c, ambiente)
 
-            plt.pause(.2) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+            plt.pause(.01) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
             plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
