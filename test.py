@@ -12,7 +12,7 @@ class TestMain_Torte(unittest.TestCase):
     def tearDown(self):
         print('after')"""
 
-    def test_movimento(self):
+    """def test_movimento(self):
 
         '''cerchiamo di testare in più step tutte le cose che fa movimento'''
 
@@ -56,14 +56,17 @@ class TestMain_Torte(unittest.TestCase):
 
         self.assertEqual(9, creatura.energia)
 
-        self.assertEqual(griglia[5][0], 0)
+        self.assertEqual(griglia[5][0], 0)"""
 
-        '''anche questo funziona, DA PENSARE SE PUO' AVERE SENSO FARE DEI TEST PIU' MIRATI'''
+    '''anche questo funziona, DA PENSARE SE PUO' AVERE SENSO FARE DEI TEST PIU' MIRATI'''
     
     def test_crossover(self):
+
+        """ATTENZIONE A QUESTI TEST: dizionari generati con randint(0,4) che deve essere sostituito con randint(0,3)
+            comuneque funziona"""
         
         """test del crossover 1/4 + 3/4"""
-        #genero due dict casualmente {i : random.randint(0, 4) for i in POSSIBILITA}
+        #genero due dict casualmente {i : random.randint(0, 3) for i in POSSIBILITA}
         dict1  = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 2, '0101': 4, '0110': 0, '0111': 4, '1000': 2, '1001': 4, '1010': 0, '1011': 4, '1100': 4, '1101': 4, '1110': 1, '1111': 0}
         dict2 = {'0000': 3, '0001': 4, '0010': 1, '0011': 3, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
         hand_made = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
@@ -78,21 +81,26 @@ class TestMain_Torte(unittest.TestCase):
         fit = [c.energia for c in lista]
         self.assertEqual(lista[2], main_torte.roulette_sampling(lista, fit))
     
-    """def test_mate(self):
-        #genero due dict casualmente {i : random.randint(0, 4) for i in POSSIBILITA}
-        dict1 = {'0000': 0, '0001': 0, '0010': 2, '0011': 1, '0100': 4, '0101': 2, '0110': 0, '0111': 2, '1000': 1, '1001': 1, '1010': 0, '1011': 2, '1100': 2, '1101': 2, '1110': 3, '1111': 1}
-        dict2 = {'0000': 3, '0001': 0, '0010': 3, '0011': 0, '0100': 2, '0101': 3, '0110': 1, '0111': 2, '1000': 4, '1001': 4, '1010': 0, '1011': 2, '1100': 3, '1101': 2, '1110': 1, '1111': 2}
+    def test_mate(self):
+        #genero due dict casualmente {i : random.randint(0, 3) for i in POSSIBILITA}
+        dict1 = {'0000': 0, '0001': 0, '0010': 2, '0011': 1, '0100': 1, '0101': 2, '0110': 0, '0111': 2, '1000': 1, '1001': 1, '1010': 0, '1011': 2, '1100': 2, '1101': 2, '1110': 3, '1111': 1}
+        dict2 = {'0000': 3, '0001': 0, '0010': 3, '0011': 0, '0100': 2, '0101': 3, '0110': 1, '0111': 2, '1000': 1, '1001': 1, '1010': 0, '1011': 2, '1100': 3, '1101': 2, '1110': 1, '1111': 2}
         c1 = main_torte.Creature(dict1)
+        c1.energia = 10
         c2 = main_torte.Creature(dict2)
+        c2.energia = 5
         #controllo di aver costruito bene le creature:
         self.assertEqual(dict1, c1.mosse)
         self.assertEqual(dict2, c2.mosse)
-        dic_figlio = {'0000': 0, '0001': 0, '0010': 2, '0011': 1, '0100': 2, '0101': 3, '0110': 1, '0111': 2, '1000': 4, '1001': 4, '1010': 0, '1011': 2, '1100': 3, '1101': 2, '1110': 1, '1111': 2}
+        dic_figlio = {'0000': 0, '0001': 0, '0010': 2, '0011': 1, '0100': 2, '0101': 3, '0110': 1, '0111': 2, '1000': 1, '1001': 1, '1010': 0, '1011': 2, '1100': 3, '1101': 2, '1110': 1, '1111': 2}
         figlio = main_torte.Creature(dic_figlio, 2, 2)
-        ris = c1.mate(c2)
+        ris = c1.mate(c2,0)
         ris.x= 2
         ris.y= 2
-        self.assertEqual(figlio, ris)"""        
+        self.assertEqual(8, ris.energia) #controllo cehe l'energia del figlio diventi la media dei genitori arrotondata per eccesso
+
+        mut_son = c1.mate(c2,1)
+        self.assertNotEqual(figlio.mosse, mut_son.mosse)
 
 
 
