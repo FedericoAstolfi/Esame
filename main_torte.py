@@ -8,15 +8,11 @@ import copy
 import matplotlib.pyplot as plt
 
 
-NTORTE = 100
+NTORTE = 10
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 10
-<<<<<<< HEAD
-'''come in self.mosse, ad esempio, 0101 significa: dx torta, su niente, sx torta, giù nientee'''
-=======
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
->>>>>>> 684f5c430d03323ae4e0baa7853907c1efdbf0f6
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class Creature():
@@ -159,10 +155,10 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
      
     #estraggo i fitness:
     fit = [creat.energia for creat in parents]
-    max = max(fit)
+    maxi = max(fit)
     
     #controllo se c'è ancora vita:
-    if fit.sum == 0:
+    if sum(fit) == 0:
         print("La popolazione si è estinta\n")
         quit()
     
@@ -171,7 +167,7 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
     off_springs = []
     #se è rimasto solo un genitore devo accettare che si riproduca con sè stesso, cosa che altrimenti evito
     if fit.count(0) == npop -1:
-        off_springs = [parents[fit.index(max)] for i in range(0, npop)]
+        off_springs = [parents[fit.index(maxi)] for i in range(0, npop)]
     
     else:
         for i in range(npop):
@@ -239,7 +235,7 @@ def plot_creature(popolazione, ambiente):
     plt.grid(linewidth=0.5, color = 'g', linestyle = '--') #tiro su una griglia 
 
     for i in range(len(popolazione)): #printo tutte le creature, che vengono messe nella loro posizione iniziale giusta
-        ax.scatter(popolazione[i].y, NGRIGLIA -1 - popolazione[i].x, color = 'r', marker = 'x')
+        ax.scatter(popolazione[i].y, NGRIGLIA -1 - popolazione[i].x, color = 'y', edgecolor = 'r', marker = 'o', s = 200)
         
     
 
@@ -265,49 +261,49 @@ if __name__=='__main__':
     mut_prob = args.mut_prob
     ngen = args.ngen
 
-    #creo prima popolazione con mosse e coord random:
-    creature = [Creature() for i in range(npop)]  
-
-    #creo un ambiente random:
-    ambiente = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
-    while np.sum(ambiente)<NTORTE:
-        ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]=1
-    print(ambiente)
-
-    """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
-    #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
-    for c in creature:
-        print(f'posizione iniale: {c.x, c.y}')
-        print(f'mosse: {c.mosse}')
-        if ambiente[c.x][c.y] == 1 :
-            c.energia += 1      #incremento energia del fortunato
-            ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
-    
-    '''proviamo a creare un grafico rozzo'''
-
-
     fig, ax = plt.subplots() #creo la mia lista di plot
 
-    plot_creature(creature, ambiente)
-    plt.title('prima generazione')
-    
-    for i in range(NMOSSE): #faccio muovere le creature della prima generazione
-        
+    #creo la prima e unica popolazione casuale
+    creature = [Creature() for i in range(npop)] 
+
+    for n in range(ngen): 
+
+        #creo un ambiente random:
+        ambiente = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
+        while np.sum(ambiente)<NTORTE:
+            ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]=1
+
+        """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
+        #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
         for c in creature:
-
-            movimento(c, ambiente)
-
-        plt.pause(0.5) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
-
-        plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
+            if ambiente[c.x][c.y] == 1 :
+                c.energia += 1      #incremento energia del fortunato
+                ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
 
         plot_creature(creature, ambiente)
-        plt.title('prima generazione')
+        plt.title(f' generazione numero {n+1}')
 
-    for c in creature:
-        print(c.energia)
+        for i in range(NMOSSE): #faccio muovere le creature della stessa generazione
+            
+            for c in creature:
+
+                movimento(c, ambiente)
+
+            plt.pause(1) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+
+            plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
+
+            plot_creature(creature, ambiente)
+            plt.title(f' generazione numero {n+1}')
+
+        '''generazione successiva:'''
+        fantoccio = get_offsprings(creature)
+        creature = fantoccio
+
+    '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e l'ultima indicizzata da ngen-1'''
 
     
+
     plt.show()
 
 
