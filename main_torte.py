@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 NTORTE = 10
 ENERGIA = 10
 NGRIGLIA = 10
-NMOSSE = 1
-'''come in self.mosse, ad esempio, 0101 significa: dx torta, su niente, sx torta, giù nientee'''
+NMOSSE = 10
+'''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class Creature():
@@ -66,11 +66,12 @@ def movimento(creatura, ambiente):
     creatura ed eventualmente rimuove una torta (si potrebbe chiamare moveat)'''
     if creatura.energia > 0: #controllo che abbia energia per muoversi
 
-        x=creatura.x
-        y=creatura.y
+        x=creatura.x #riga in cui sta creatura
+        y=creatura.y #colonna in cui creatura
         
         #chiave_list contiene gli elementi limitrofi in ambiente alla posizione che occupa creatura
-        chiave_list = [ambiente[(x+1)%10][y], ambiente[x][(y+1)%10], ambiente[(x-1)%10][y], ambiente[x][(y-1)%10]]
+        #cerco di fare gli spostamenti nel sistema di coordinate della matrice
+        chiave_list = [ambiente[x][(y+1)%10], ambiente[(x-1)%10][y], ambiente[x][(y-1)%10], ambiente[(x+1)%10][y]]
         #però a me serve come stringa per accedere agli elementi del dizionario
         chiave = "".join([str(item) for item in chiave_list])
 
@@ -79,13 +80,13 @@ def movimento(creatura, ambiente):
         #ora facciamo spostare la creatura a seconda di quello che ha codificato nel genoma
 
         if mossa == 0:
-            creatura.x = (x+1)%10
-        elif mossa == 1:
             creatura.y = (y+1)%10
-        elif mossa == 2:
+        elif mossa == 1:
             creatura.x = (x-1)%10
-        elif mossa == 3:
+        elif mossa == 2:
             creatura.y = (y-1)%10
+        elif mossa == 3:
+            creatura.x = (x+1)%10
 
         #ora che la creatura si è spostata, vediamo di fare le modifiche opportune:
 
@@ -220,8 +221,8 @@ def plot_creature(popolazione, ambiente):
     ax.scatter(torta_x, torta_y, color = 'b') #plotto i punti con scatter
     plt.grid(linewidth=0.5, color = 'g', linestyle = '--') #tiro su una griglia 
 
-    for i in range(len(creature)): #printo tutte le creature, che vengono messe nella loro posizione iniziale giusta
-        ax.scatter(creature[i].x, creature[i].y, color = 'r', marker = 'x')
+    for i in range(len(popolazione)): #printo tutte le creature, che vengono messe nella loro posizione iniziale giusta
+        ax.scatter(popolazione[i].y, NGRIGLIA -1 - popolazione[i].x, color = 'r', marker = 'x')
         
     
 
@@ -259,7 +260,8 @@ if __name__=='__main__':
     """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
     #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
     for c in creature:
-        print(c.x, c.y)
+        print(f'posizione iniale: {c.x, c.y}')
+        print(f'mosse: {c.mosse}')
         if ambiente[c.x][c.y] == 1 :
             c.energia += 1      #incremento energia del fortunato
             ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
@@ -268,20 +270,25 @@ if __name__=='__main__':
 
 
     fig, ax = plt.subplots() #creo la mia lista di plot
+
+    plot_creature(creature, ambiente)
+    plt.title('prima generazione')
     
     for i in range(NMOSSE): #faccio muovere le creature della prima generazione
-
-        plot_creature(creature, ambiente)
-        plt.title('prima generazione')
         
         for c in creature:
 
             movimento(c, ambiente)
 
-        plt.pause(1) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+        plt.pause(0.5) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
         plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
+        plot_creature(creature, ambiente)
+        plt.title('prima generazione')
+
+    for c in creature:
+        print(c.energia)
 
     
     plt.show()
