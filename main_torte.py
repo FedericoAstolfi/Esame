@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 NTORTE = 10
 ENERGIA = 10
 NGRIGLIA = 10
-NMOSSE = 10
+NMOSSE = 5
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
@@ -47,8 +47,12 @@ class Creature():
             r = list(range(0,4))
             r.remove(gene_value)
             mosse_figlio[gene] = random.choice(r)
-
-        return Creature(mosse_figlio)         
+        
+        c = Creature(mosse_figlio)
+        #arrotondo per eccesso l'energia del figlio
+        a = round(((self.energia + other.energia)*0.5)+0.1)  # vista la natura del problema aggiungere 0.1 mi assicura di arrotondare per eccesso
+        c.energia = int(a)  #converto in int per sicurezza
+        return c    
 
 
 
@@ -181,7 +185,6 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
                     parent1 = roulette_sampling(parents, fit)
                 off_springs.append(parent1.mate(parent2, mut_prob))
             
-    print('pippo')
     return off_springs
 
 '''COMMENTI PER AVERE UN'IDEA DI COSA FARE
@@ -297,9 +300,11 @@ if __name__=='__main__':
             plot_creature(creature, ambiente)
             plt.title(f' generazione numero {n+1}')
 
+
+        media = sum([c.energia for c in creature]) / len(creature)
+        print(f"media aritmetica delle energia nella generazione numero {n}: {media}")
         '''generazione successiva:'''
-        fantoccio = get_offsprings(creature)
-        creature = fantoccio
+        creature = get_offsprings(creature)
 
     '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e l'ultima indicizzata da ngen-1'''
 
