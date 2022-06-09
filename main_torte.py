@@ -38,7 +38,7 @@ class Creature():
         mosse_figlio = crossover(self.mosse, other.mosse)
 
         """implemento le mutazioni casuali: con probabilità mut_prob un gene del figlio viene cambiato casualmente
-        con distribuzione uniforme tra le 4 possibilità"""
+        con distribuzione uniforme tra le 3 possibilità rimanenti"""
         rn = random.random()        #genero numero casuale
         if rn < mut_prob:
             gene = random.choice(list(mosse_figlio.keys())) #estraggo il gene da modificare
