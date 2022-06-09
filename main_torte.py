@@ -8,15 +8,11 @@ import copy
 import matplotlib.pyplot as plt
 
 
-NTORTE = 100
+NTORTE = 10
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 10
-<<<<<<< HEAD
-'''come in self.mosse, ad esempio, 0101 significa: dx torta, su niente, sx torta, giù nientee'''
-=======
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
->>>>>>> 684f5c430d03323ae4e0baa7853907c1efdbf0f6
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
 class Creature():
