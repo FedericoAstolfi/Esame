@@ -8,7 +8,7 @@ import copy
 import matplotlib.pyplot as plt
 
 
-NTORTE = 10
+NTORTE = 60
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
@@ -56,6 +56,8 @@ class Creature():
 
 
 
+
+
 '''facciamo che per ora lascio stare la classe ambiente, ma al suo posto uso una semplice
 matrice che mi definisco a mano ogni volta nel main: non dovrebbe essere troppo una sbatta'''
 
@@ -88,7 +90,7 @@ def movimento(creatura, ambiente):
         
         #chiave_list contiene gli elementi limitrofi in ambiente alla posizione che occupa creatura
         #cerco di fare gli spostamenti nel sistema di coordinate della matrice
-        chiave_list = [ambiente[x][(y+1)%10], ambiente[(x-1)%10][y], ambiente[x][(y-1)%10], ambiente[(x+1)%10][y]]
+        chiave_list = [ambiente[x][(y+1)%NGRIGLIA], ambiente[(x-1)%NGRIGLIA][y], ambiente[x][(y-1)%NGRIGLIA], ambiente[(x+1)%NGRIGLIA][y]]
         #però a me serve come stringa per accedere agli elementi del dizionario
         chiave = "".join([str(item) for item in chiave_list])
 
@@ -97,13 +99,13 @@ def movimento(creatura, ambiente):
         #ora facciamo spostare la creatura a seconda di quello che ha codificato nel genoma
 
         if mossa == 0:
-            creatura.y = (y+1)%10
+            creatura.y = (y+1)%NGRIGLIA
         elif mossa == 1:
-            creatura.x = (x-1)%10
+            creatura.x = (x-1)%NGRIGLIA
         elif mossa == 2:
-            creatura.y = (y-1)%10
+            creatura.y = (y-1)%NGRIGLIA
         elif mossa == 3:
-            creatura.x = (x+1)%10
+            creatura.x = (x+1)%NGRIGLIA
 
         #ora che la creatura si è spostata, vediamo di fare le modifiche opportune:
 
@@ -141,7 +143,8 @@ def crossover(dict1, dict2):
 def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondenti
     '''associamo virtualmente all'elemento i-esimo della list la probabilità i-esima di prob'''
     prob=copy.copy(fit)
-    prob=prob/np.sum(prob)
+    massa = sum(prob)
+    prob = [ i / massa for i in prob]
     cum=np.cumsum(prob)
     cum=cum.tolist()
     rn=random.random()
@@ -166,8 +169,6 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
         print("La popolazione si è estinta\n")
         quit()
     
-    
-
     off_springs = []
     #se è rimasto solo un genitore devo accettare che si riproduca con sè stesso, cosa che altrimenti evito
     if fit.count(0) == npop -1:
@@ -227,9 +228,9 @@ def plot_creature(popolazione, ambiente):
                 torta_x += [j]
                 torta_y += [NGRIGLIA -1 - i]
 
-    ax.set_xlim(-0.5, 9.5)
-    ax.set_ylim(-0.5, 9.5)
-    my_ticks = range(10) #crea degli sticker che sotto appiccico sull'asse delle x e delle y
+    ax.set_xlim(-0.5, NGRIGLIA)
+    ax.set_ylim(-0.5, NGRIGLIA )
+    my_ticks = range(NGRIGLIA) #crea degli sticker che sotto appiccico sull'asse delle x e delle y
     plt.xticks(my_ticks)
     plt.yticks(my_ticks)
     '''sta boomerata degli sticker l'ho fatta perchè altrimenti python è stupido e mi mette il reticolo della griglia 
@@ -277,6 +278,8 @@ if __name__=='__main__':
         while np.sum(ambiente)<NTORTE:
             ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]=1
 
+        media_energia_iniziale = sum([c.energia for c in creature]) / len(creature)
+
         """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
         #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
         for c in creature:
@@ -293,7 +296,7 @@ if __name__=='__main__':
 
                 movimento(c, ambiente)
 
-            plt.pause(.01) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+            plt.pause(.001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
             plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
@@ -301,8 +304,9 @@ if __name__=='__main__':
             plt.title(f' generazione numero {n+1}')
 
 
-        media = sum([c.energia for c in creature]) / len(creature)
-        print(f"media aritmetica delle energia nella generazione numero {n}: {media}")
+        media_energia = sum([c.energia for c in creature]) / len(creature)
+        print(f"media aritmetica delle energia nella generazione numero {n+1}: {media_energia}.   differenza tra medie prima a e dopo il movimento: {media_energia_iniziale - media_energia}")
+
         '''generazione successiva:'''
         creature = get_offsprings(creature)
 
@@ -312,16 +316,6 @@ if __name__=='__main__':
 
     plt.show()
 
-
-        
-'''dobbiamo ricordarci di assicurarci che le creature non possano avere energia negativa'''
-
-'''DOBBIAMO CAMBIARE UNA COSA IMPORTANTE: NELLA CHIAVE DELLE MOSSE
-DELLA CREATURA NON ABBIAMO TENUTO CONTO CHE IN UNA MATRICE, SE PRENDO
-[I][J], ALLORA I INDICA L'ORDINATA E J L'ASCISSA. NE HO TENUTO CONTO PER
-PLOTTRE LE TORTE E LA POSIZIONE INIZIALE DELLA CREATURA, MA NEL METODO 
-MOVIMENTO NON NE AVEVO TENUTO CONTO, QUINDI PER VEDERE COSA C'è AD ESEMPIO
-A DX DELLA CREATURA DEVO GUARDARE L'ELEMENTO [I][J+1], NON IL [I+1][J]
-IN MODO SIMILE RAGIONIAMO SUL FATTO CHE HO 'RIBALTATO' LE COORDINATE DELLA 
-MATRICE PER METTERLA BENE ALL'INTERNO DEL GRAFICO E CHE QUINDI FORSE DOBBIAMO
-RIBALTARE ANCHE I MOVIMENTI SU E GIU DELLA CREATURA'''
+    #print(f'ecco le mosse dell ultima generazione:\n')
+    #for i in creature:
+        #print(i.mosse)
