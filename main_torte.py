@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 NTORTE = 10
-ENERGIA = 10
+ENERGIA = 20
 NGRIGLIA = 10
 NMOSSE = 10
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
@@ -181,6 +181,7 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
                     parent1 = roulette_sampling(parents, fit)
                 off_springs.append(parent1.mate(parent2))
             
+    print('pippo')
     return off_springs
 
 '''COMMENTI PER AVERE UN'IDEA DI COSA FARE
@@ -289,7 +290,7 @@ if __name__=='__main__':
 
                 movimento(c, ambiente)
 
-            plt.pause(1) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+            plt.pause(.2) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
             plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
