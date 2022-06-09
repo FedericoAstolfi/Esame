@@ -8,7 +8,7 @@ import copy
 import matplotlib.pyplot as plt
 
 
-NTORTE = 10
+NTORTE = 24
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
@@ -117,7 +117,8 @@ def movimento(creatura, ambiente):
             #non modifico ambiente
         else:
             #non modifico energia
-            ambiente[x_new][y_new] = 0
+            creatura.energia +=1
+            ambiente[x_new][y_new] += 0
 
 
 def crossover(dict1, dict2):
@@ -227,9 +228,9 @@ def plot_creature(popolazione, ambiente):
                 torta_x += [j]
                 torta_y += [NGRIGLIA -1 - i]
 
-    ax.set_xlim(-0.5, 9.5)
-    ax.set_ylim(-0.5, 9.5)
-    my_ticks = range(10) #crea degli sticker che sotto appiccico sull'asse delle x e delle y
+    ax.set_xlim(-0.5, NGRIGLIA-0.5)
+    ax.set_ylim(-0.5, NGRIGLIA-0.5)
+    my_ticks = range(NGRIGLIA) #crea degli sticker che sotto appiccico sull'asse delle x e delle y
     plt.xticks(my_ticks)
     plt.yticks(my_ticks)
     '''sta boomerata degli sticker l'ho fatta perchè altrimenti python è stupido e mi mette il reticolo della griglia 
@@ -314,14 +315,6 @@ if __name__=='__main__':
 
 
         
-'''dobbiamo ricordarci di assicurarci che le creature non possano avere energia negativa'''
-
-'''DOBBIAMO CAMBIARE UNA COSA IMPORTANTE: NELLA CHIAVE DELLE MOSSE
-DELLA CREATURA NON ABBIAMO TENUTO CONTO CHE IN UNA MATRICE, SE PRENDO
-[I][J], ALLORA I INDICA L'ORDINATA E J L'ASCISSA. NE HO TENUTO CONTO PER
-PLOTTRE LE TORTE E LA POSIZIONE INIZIALE DELLA CREATURA, MA NEL METODO 
-MOVIMENTO NON NE AVEVO TENUTO CONTO, QUINDI PER VEDERE COSA C'è AD ESEMPIO
-A DX DELLA CREATURA DEVO GUARDARE L'ELEMENTO [I][J+1], NON IL [I+1][J]
-IN MODO SIMILE RAGIONIAMO SUL FATTO CHE HO 'RIBALTATO' LE COORDINATE DELLA 
-MATRICE PER METTERLA BENE ALL'INTERNO DEL GRAFICO E CHE QUINDI FORSE DOBBIAMO
-RIBALTARE ANCHE I MOVIMENTI SU E GIU DELLA CREATURA'''
+""" problemi attuali: 
+- in certe situazioni rimane una sola creatura viva nel plot ma se ne devono vedere sempre popsize
+- """
