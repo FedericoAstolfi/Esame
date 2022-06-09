@@ -8,10 +8,10 @@ import copy
 import matplotlib.pyplot as plt
 
 
-NTORTE = 10
+NTORTE = 100
 ENERGIA = 10
 NGRIGLIA = 10
-NMOSSE = 1
+NMOSSE = 10
 '''come in self.mosse, ad esempio, 0101 significa: dx torta, su niente, sx torta, giù nientee'''
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
@@ -33,10 +33,23 @@ class Creature():
         
         self.energia = energia
 
-    def mate(self, other):
+    def mate(self, other, mut_prob):
         """genera un figlio con dizionario dato da un crossover dei dizionari genitori e con posizioni casuali"""
         mosse_figlio = crossover(self.mosse, other.mosse)
-        return Creature(mosse_figlio)
+
+        """implemento le mutazioni casuali: con probabilità mut_prob un gene del figlio viene cambiato casualmente
+        con distribuzione uniforme tra le 4 possibilità"""
+        rn = random.random()        #genero numero casuale
+        if rn < mut_prob:
+            gene = random.choice(list(mosse_figlio.keys())) #estraggo il gene da modificare
+            gene_value = mosse_figlio[gene]                 #la mossa corrispondente al gene
+            #non voglio mutare il gene con la stessa mossa:
+            r = list(range(0,4))
+            r.remove(gene_value)
+            mosse_figlio[gene] = random.choice(r)
+
+        return Creature(mosse_figlio)         
+
 
 
 '''facciamo che per ora lascio stare la classe ambiente, ma al suo posto uso una semplice
@@ -132,7 +145,7 @@ def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondent
             risultato = list[cum.index(i)]
             return risultato
 
-def get_offsprings(parents, mut_prob): #lista di creature e prob di mutazione
+def get_offsprings(parents): #lista di creature e prob di mutazione
     '''rimpiazzo tutte le creature con i figli di queste, cioè npop nuove creature.
         le creature figlie hanno come energia la media delle energie dei genitori arrotondata per eccesso.
         nel caso in cui tutte le creature abbiano energia 0, la popolazione si estingue:  lo segnalo.
