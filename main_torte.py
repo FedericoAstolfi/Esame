@@ -7,7 +7,7 @@ import argparse
 import copy
 import matplotlib.pyplot as plt
 
-CUT_CRSS = 8
+CUT_CRSS = 4
 NTORTE = 40
 ENERGIA = 10
 NGRIGLIA = 10
@@ -248,14 +248,18 @@ def plot_creature(popolazione, ambiente):
     for i in range(len(popolazione)): #printo tutte le creature, che vengono messe nella loro posizione iniziale giusta
         ax.scatter(popolazione[i].y, NGRIGLIA -1 - popolazione[i].x, color = 'y', edgecolor = 'r', marker = 'o', s = 200)
         
-    
+
+            
 def goodness(dict1):
     """dato il dizionario di una creatura conta in quante delle 15 possibilità essa vada su una torta quando c'è"""
-    
-
-
-    
-
+    count = 0
+    chiavi = list(dict1.keys())
+    for k in chiavi: #scorro sulle chiavi
+        for i in range(0,4): #scorro sui 4 bit
+            if int(k[i]) == 1 and dict1[k] == i:
+                count += 1
+                break
+    return count
 
 
 # PROGRAMMA PRINCIPALE
@@ -314,8 +318,9 @@ if __name__=='__main__':
 
         energie = [c.energia for c in creature]
         best_en = max(energie)
-        media_energia = sum([c.energia for c in creature]) / len(creature)
-        print(f"media aritmetica delle energia nella generazione numero {n+1}: {media_energia} \t differenza tra medie prima a e dopo il movimento: {media_energia_iniziale - media_energia}")
+        media_energia = sum(energie) / len(creature)
+        media_bonta = sum([goodness(c.mosse) for c in creature])/ len(creature) #media delle bontà di ogni creatura
+        print(f"energia e bonta media nella generazione numero {n+1}: {round(media_energia,2), round(media_bonta,2)} \t differenza tra medie prima a e dopo il movimento: {round(media_energia_iniziale - media_energia, 2)}")
 
         '''generazione successiva EVOLUTIVA:''' 
         creature = get_offsprings(creature) #commentando questa linea tolgo tutto lo sforzo darwiniano
