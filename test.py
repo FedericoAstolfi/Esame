@@ -59,19 +59,21 @@ class TestMain_Torte(unittest.TestCase):
         self.assertEqual(griglia[5][0], 0)"""
 
     '''anche questo funziona, DA PENSARE SE PUO' AVERE SENSO FARE DEI TEST PIU' MIRATI'''
-    
-    def test_crossover(self):
-
-        """ATTENZIONE A QUESTI TEST: dizionari generati con randint(0,4) che deve essere sostituito con randint(0,3)
+   
+   
+    """ATTENZIONE A QUESTI TEST: dizionari generati con randint(0,4) che deve essere sostituito con randint(0,3)
             comuneque funziona"""
+    """def test_crossover(self):
+
         
-        """test del crossover 1/4 + 3/4"""
+        
+        #test del crossover 1/4 + 3/4
         #genero due dict casualmente {i : random.randint(0, 3) for i in POSSIBILITA}
         dict1  = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 2, '0101': 4, '0110': 0, '0111': 4, '1000': 2, '1001': 4, '1010': 0, '1011': 4, '1100': 4, '1101': 4, '1110': 1, '1111': 0}
         dict2 = {'0000': 3, '0001': 4, '0010': 1, '0011': 3, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
         hand_made = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
-        self.assertEqual(hand_made, main_torte.crossover(dict1, dict2))
-    
+        self.assertEqual(hand_made, main_torte.crossover(dict1, dict2))"""
+
     def test_roulette_sampling(self):
         #genero una lista di tre creature di cui due con energia nulla e controllo che mi estragga il terzo
         lista = [main_torte.Creature(),main_torte.Creature(), main_torte.Creature()]
@@ -102,6 +104,11 @@ class TestMain_Torte(unittest.TestCase):
         mut_son = c1.mate(c2,1)
         self.assertNotEqual(figlio.mosse, mut_son.mosse)
 
+    def test_goodness(self):
+        #genero dict casualmente {i : random.randint(0, 3) for i in POSSIBILITA}
+        dict = {'0000': 2, '0001': 3, '0010': 0, '0011': 0, '0100': 3, '0101': 3, '0110': 3, '0111': 3, '1000': 1, '1001': 1, '1010': 0, '1011': 2, '1100': 1, '1101': 3, '1110': 1, '1111': 3}
+        #conto:  no         si          no          no          no      si          no          si          no          no          si      si         si           si          si          si
+        self.assertEqual(9, main_torte.goodness(dict))
 
 
 if __name__ == '__main__':
