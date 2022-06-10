@@ -7,12 +7,8 @@ import argparse
 import copy
 import matplotlib.pyplot as plt
 
-
-<<<<<<< HEAD
-NTORTE = 24
-=======
-NTORTE = 60
->>>>>>> 0cc5d480921af35feb2e739d8d7e52c5af945321
+CUT_CRSS = 8
+NTORTE = 40
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
@@ -123,7 +119,7 @@ def movimento(creatura, ambiente):
             #non modifico ambiente
         else:
             #non modifico energia
-            creatura.energia +=1
+            #creatura.energia +=1
             ambiente[x_new][y_new] += 0
 
 
@@ -139,8 +135,8 @@ def crossover(dict1, dict2):
         questo perchè se una creatura è buona vuol dire che: va verso le torte quando ci sono (e questo viene
         mantenuto dalla scelta del crossover) e tende a usare 2 direzioni invece di 4 (con questo crossover
         rischio meno di trovarmi con le quattro direzioni ben mischiate) """
-    dict_a = { i : dict1[i] for i in POSSIBILITA[0:4] } #il primo quarto da dict1
-    dict_b= { i : dict2[i] for i in POSSIBILITA[4:16] } #il resto da dict2
+    dict_a = { i : dict1[i] for i in POSSIBILITA[0:CUT_CRSS] } #il primo quarto da dict1
+    dict_b= { i : dict2[i] for i in POSSIBILITA[CUT_CRSS:16] } #il resto da dict2
 
     return {**dict_a,**dict_b}  # accosto i due dictionary e restituisco il risultato
 
@@ -233,13 +229,8 @@ def plot_creature(popolazione, ambiente):
                 torta_x += [j]
                 torta_y += [NGRIGLIA -1 - i]
 
-<<<<<<< HEAD
-    ax.set_xlim(-0.5, NGRIGLIA-0.5)
-    ax.set_ylim(-0.5, NGRIGLIA-0.5)
-=======
     ax.set_xlim(-0.5, NGRIGLIA)
     ax.set_ylim(-0.5, NGRIGLIA )
->>>>>>> 0cc5d480921af35feb2e739d8d7e52c5af945321
     my_ticks = range(NGRIGLIA) #crea degli sticker che sotto appiccico sull'asse delle x e delle y
     plt.xticks(my_ticks)
     plt.yticks(my_ticks)
@@ -306,7 +297,7 @@ if __name__=='__main__':
 
                 movimento(c, ambiente)
 
-            plt.pause(.001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+            plt.pause(.00001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
             plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
@@ -326,14 +317,14 @@ if __name__=='__main__':
 
     plt.show()
 
-<<<<<<< HEAD
+    print(f'ecco le mosse dell ultima generazione:\n')
+    for i in creature:
+        print(i.mosse)
 
-        
-""" problemi attuali: 
-- in certe situazioni rimane una sola creatura viva nel plot ma se ne devono vedere sempre popsize
-- """
-=======
-    #print(f'ecco le mosse dell ultima generazione:\n')
-    #for i in creature:
-        #print(i.mosse)
->>>>>>> 0cc5d480921af35feb2e739d8d7e52c5af945321
+
+"""risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono rislutati simili di crescita
+    dell'energia, ma meno velocemente. nonostante questo una mutazione bassa mi sembra comunque da preferire nell'ottica
+    di ottenere, con abbastanza generazioni la creatura quasi perfetta) 
+    (100 generazione per esempio) e con 40 torte, 10 griglia
+    10 energia e 5 mosse: recuperano energia se riescono a superare la prima decina di generazioni e quindi imparare,
+    raggiungono in 100 generazioni anche picchi di 5 di energia media dopo essere stati a 0.5 inizialmente"""
