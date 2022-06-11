@@ -7,8 +7,8 @@ import argparse
 import copy
 import matplotlib.pyplot as plt
 
-
-NTORTE = 60
+CUT_CRSS = 4
+NTORTE = 40
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
@@ -119,7 +119,8 @@ def movimento(creatura, ambiente):
             #non modifico ambiente
         else:
             #non modifico energia
-            ambiente[x_new][y_new] = 0
+            #creatura.energia +=1
+            ambiente[x_new][y_new] += 0
 
 
 def crossover(dict1, dict2):
@@ -134,24 +135,28 @@ def crossover(dict1, dict2):
         questo perchè se una creatura è buona vuol dire che: va verso le torte quando ci sono (e questo viene
         mantenuto dalla scelta del crossover) e tende a usare 2 direzioni invece di 4 (con questo crossover
         rischio meno di trovarmi con le quattro direzioni ben mischiate) """
-    dict_a = { i : dict1[i] for i in POSSIBILITA[0:4] } #il primo quarto da dict1
-    dict_b= { i : dict2[i] for i in POSSIBILITA[4:16] } #il resto da dict2
+    dict_a = { i : dict1[i] for i in POSSIBILITA[0:CUT_CRSS] } #il primo quarto da dict1
+    dict_b= { i : dict2[i] for i in POSSIBILITA[CUT_CRSS:16] } #il resto da dict2
 
     return {**dict_a,**dict_b}  # accosto i due dictionary e restituisco il risultato
 
 
 def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondenti
     '''associamo virtualmente all'elemento i-esimo della list la probabilità i-esima di prob'''
-    prob=copy.copy(fit)
-    massa = sum(prob)
-    prob = [ i / massa for i in prob]
-    cum=np.cumsum(prob)
-    cum=cum.tolist()
-    rn=random.random()
-    for i in cum:
-        if rn<i:
-            risultato = list[cum.index(i)]
-            return risultato
+    if sum(fit) != 0:
+        prob = copy.copy(fit)
+        massa = sum(prob)
+        proba = [ i / massa for i in prob]
+        cum=np.cumsum(proba)
+        cum=cum.tolist()
+        rn=random.random()
+        for i in cum:
+            if rn<i:
+                risultato = list[cum.index(i)]
+                return risultato
+    else:
+        print("i fit sono tutti zero")
+
 
 def get_offsprings(parents): #lista di creature e prob di mutazione
     '''rimpiazzo tutte le creature con i figli di queste, cioè npop nuove creature.
@@ -181,9 +186,10 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
             parent2 = roulette_sampling(parents,fit)
             if parent1.mosse != parent2.mosse:    #se ho preso due parenti diversi li tengo e accoppio
                 off_springs.append(parent1.mate(parent2, mut_prob))
-            else:           #altrimenti continuo finchè non sono diversi
-                while parent1.mosse == parent2.mosse:
+            else:           #altrimenti continuo finchè non sono diversi DA VALUTARE QUESTO WHILE
+                while parent1.mosse == parent2.mosse and parent1.x == parent2.x and parent1.y == parent2.y :
                     parent1 = roulette_sampling(parents, fit)
+                    #print("qui") #questo while viene ripetuto molte volte in alcune situazioni (per esempio se rimangono solo due creature, una con energia 1 e l'altra con energia 0.0001)
                 off_springs.append(parent1.mate(parent2, mut_prob))
             
     return off_springs
@@ -242,11 +248,18 @@ def plot_creature(popolazione, ambiente):
     for i in range(len(popolazione)): #printo tutte le creature, che vengono messe nella loro posizione iniziale giusta
         ax.scatter(popolazione[i].y, NGRIGLIA -1 - popolazione[i].x, color = 'y', edgecolor = 'r', marker = 'o', s = 200)
         
-    
 
-
-    
-
+            
+def goodness(dict1):
+    """dato il dizionario di una creatura conta in quante delle 15 possibilità essa vada su una torta quando c'è"""
+    count = 0
+    chiavi = list(dict1.keys())
+    for k in chiavi: #scorro sulle chiavi
+        for i in range(0,4): #scorro sui 4 bit
+            if int(k[i]) == 1 and dict1[k] == i:
+                count += 1
+                break
+    return count
 
 
 # PROGRAMMA PRINCIPALE
@@ -296,19 +309,29 @@ if __name__=='__main__':
 
                 movimento(c, ambiente)
 
-            plt.pause(.001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+            plt.pause(.00001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
             plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
             plot_creature(creature, ambiente)
             plt.title(f' generazione numero {n+1}')
 
+        energie = [c.energia for c in creature]
+        best_en = max(energie)
+        media_energia = sum(energie) / len(creature)
+        media_bonta = sum([goodness(c.mosse) for c in creature])/ len(creature) #media delle bontà di ogni creatura
+        print(f"energia e bonta media nella generazione numero {n+1}: {round(media_energia,2), round(media_bonta,2)} \t differenza tra medie prima a e dopo il movimento: {round(media_energia_iniziale - media_energia, 2)}")
 
-        media_energia = sum([c.energia for c in creature]) / len(creature)
-        print(f"media aritmetica delle energia nella generazione numero {n+1}: {media_energia}.   differenza tra medie prima a e dopo il movimento: {media_energia_iniziale - media_energia}")
+        '''generazione successiva EVOLUTIVA:''' 
+        creature = get_offsprings(creature) #commentando questa linea tolgo tutto lo sforzo darwiniano
 
-        '''generazione successiva:'''
-        creature = get_offsprings(creature)
+        """generazione successiva CASUALE:
+            tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
+            i più adatti e evoluzione completamente casuale. Utile per discriminare i set di parametri troppo permissivi
+            (cioè quelli in cui anche un approccio casuale basterebbe).
+            Scelgo di dare a tutti i figli casuali addirittura l'energia del migliore dei genitori (altrimenti
+            hanno sempre energia 10 e non muoiono mai)"""
+        #creature = [Creature(energia=best_en) for i in range(npop)]   
 
     '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e l'ultima indicizzata da ngen-1'''
 
@@ -316,6 +339,17 @@ if __name__=='__main__':
 
     plt.show()
 
-    #print(f'ecco le mosse dell ultima generazione:\n')
-    #for i in creature:
-        #print(i.mosse)
+    print(f'ecco le mosse dell ultima generazione:\n')
+    for i in creature:
+        print(i.mosse)
+
+
+"""risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
+    dell'energia, ma meno velocemente. nonostante questo una mutazione bassa mi sembra comunque da preferire nell'ottica
+    di ottenere, con abbastanza generazioni la creatura quasi perfetta) 
+    (100 generazione per esempio) e con 40 torte, 10 griglia
+    10 energia e 5 mosse: recuperano energia se riescono a superare la prima decina di generazioni e quindi imparare,
+    raggiungono in 100 generazioni anche picchi di 5 di energia media dopo essere stati a 0.5 inizialmente"""
+
+""" al momento, dagli esperimenti, non mi sembra evidente l'importanza delle mutazioni: anche azzerandole c'è progresso.
+    rischi di massimi locali però?"""
