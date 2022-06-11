@@ -1,5 +1,6 @@
 # Esame di Algoritmi Genetici
 
+from matplotlib import image
 import numpy as np
 import random
 from numpy import NaN
@@ -14,6 +15,8 @@ NGRIGLIA = 10
 NMOSSE = 5
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
+
+
 
 
 
@@ -160,7 +163,7 @@ def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondent
         print("i fit sono tutti zero")
 
 
-def get_offsprings(parents): #lista di creature e prob di mutazione
+def get_offsprings(parents, npop, mut_prob): #lista di creature e prob di mutazione
     '''rimpiazzo tutte le creature con i figli di queste, cioè npop nuove creature.
         le creature figlie hanno come energia la media delle energie dei genitori arrotondata per eccesso.
         nel caso in cui tutte le creature abbiano energia 0, la popolazione si estingue:  lo segnalo.
@@ -214,7 +217,7 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
 -definisco qualcosa che a ogni mossa toglie 1 di energia oppure non toglie nulla alla creatura
 - '''
     
-def plot_creature(popolazione, ambiente):
+def plot_creature(popolazione, ambiente, ax):
     
     '''
     -come lo zaro ha fatto in gencolors, mi sembrava sensato usare un metodo che si occupasse dei plot
@@ -276,25 +279,28 @@ def goodness(dict1):
 
 # PROGRAMMA PRINCIPALE
 
-if __name__=='__main__':
+def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True):
 
-    parser = argparse.ArgumentParser(description = "Istinto di sopravvivenza con algoritmi genetici")
-    parser.add_argument('popsize', help= "Numero di creature", type=int)
-    parser.add_argument('mut_prob', help= "Probabilità di mutazione", type=float)
-    parser.add_argument('ngen', help= "Numero di generazioni", type=int)
-    parser.add_argument('--no_plots', help="does not show plots", default=False, action='store_true')
-    args = parser.parse_args()
+    #parser = argparse.ArgumentParser(description = "Istinto di sopravvivenza con algoritmi genetici")
+    #parser.add_argument('popsize', help= "Numero di creature", type=int)
+    #parser.add_argument('mut_prob', help= "Probabilità di mutazione", type=float)
+    #parser.add_argument('ngen', help= "Numero di generazioni", type=int)
+    #parser.add_argument('--no_plots', help="does not show plots", default=False, action='store_true')
+    #args = parser.parse_args()
 
-    print(args)
+    #print(args)
 
-    npop = args.popsize
-    mut_prob = args.mut_prob
-    ngen = args.ngen
+    #npop = args.popsize
+    #mut_prob = args.mut_prob
+    #ngen = args.ngen
 
     fig, ax = plt.subplots() #creo la mia lista di plot
 
     #creo la prima e unica popolazione casuale
     creature = [Creature() for i in range(npop)] 
+
+    NTORTE = ntorte
+    CUT_CRSS = cut_crss
 
     for n in range(ngen): 
 
@@ -312,8 +318,10 @@ if __name__=='__main__':
                 c.energia += 1      #incremento energia del fortunato
                 ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
 
-        plot_creature(creature, ambiente)
-        plt.title(f' generazione numero {n+1}')
+        if grafici:
+
+            plot_creature(creature, ambiente, ax)
+            plt.title(f' generazione numero {n+1}')
 
         for i in range(NMOSSE): #faccio muovere le creature della stessa generazione
             
@@ -321,12 +329,14 @@ if __name__=='__main__':
 
                 movimento(c, ambiente)
 
-            plt.pause(.001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+            if grafici:
 
-            plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
+                plt.pause(.001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
-            plot_creature(creature, ambiente)
-            plt.title(f' generazione numero {n+1}')
+                plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
+
+                plot_creature(creature, ambiente, ax)
+                plt.title(f' generazione numero {n+1}')
 
         energie = [c.energia for c in creature]
         best_en = max(energie)
@@ -335,7 +345,7 @@ if __name__=='__main__':
         print(f"energia e bonta media nella generazione numero {n+1}: {round(media_energia,2), round(media_bonta,2)} \t differenza tra medie prima a e dopo il movimento: {round(media_energia_iniziale - media_energia, 2)}")
 
         '''generazione successiva EVOLUTIVA:''' 
-        creature = get_offsprings(creature) #commentando questa linea tolgo tutto lo sforzo darwiniano
+        creature = get_offsprings(creature, npop, mut_prob) #commentando questa linea tolgo tutto lo sforzo darwiniano
 
         """generazione successiva CASUALE:
             tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
@@ -348,8 +358,8 @@ if __name__=='__main__':
     '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e l'ultima indicizzata da ngen-1'''
 
     
-
-    plt.show()
+    if grafici:
+        plt.show()
 
     print(f'ecco le mosse dell ultima generazione:\n')
     for i in creature:
