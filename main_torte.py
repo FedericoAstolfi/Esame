@@ -163,7 +163,7 @@ def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondent
         print("i fit sono tutti zero")
 
 
-def get_offsprings(parents, npop, mut_prob): #lista di creature e prob di mutazione
+def get_offsprings(parents, npop, mut_prob, scritte): #lista di creature e prob di mutazione
     '''rimpiazzo tutte le creature con i figli di queste, cioè npop nuove creature.
         le creature figlie hanno come energia la media delle energie dei genitori arrotondata per eccesso.
         nel caso in cui tutte le creature abbiano energia 0, la popolazione si estingue:  lo segnalo.
@@ -174,13 +174,15 @@ def get_offsprings(parents, npop, mut_prob): #lista di creature e prob di mutazi
     fit = [creat.energia for creat in parents]
     maxi = max(fit)
 
-    print(fit)
+    if scritte:
+        print(fit)
     
     #controllo se c'è ancora vita:
     if sum(fit) == 0:
         print("La popolazione si è estinta\n")
-        quit()
+        #quit()
         '''dobbiamo togliere il quit e mettere un return 0'''
+        return []
     
     off_springs = []
     #se è rimasto solo un genitore devo accettare che si riproduca con sè stesso, cosa che altrimenti evito
@@ -280,7 +282,7 @@ def goodness(dict1):
 
 # PROGRAMMA PRINCIPALE
 
-def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True):
+def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritte = True):
 
     #parser = argparse.ArgumentParser(description = "Istinto di sopravvivenza con algoritmi genetici")
     #parser.add_argument('popsize', help= "Numero di creature", type=int)
@@ -343,11 +345,16 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True):
         best_en = max(energie)
         media_energia = sum(energie) / len(creature)
         media_bonta = sum([goodness(c.mosse) for c in creature])/ len(creature) #media delle bontà di ogni creatura
-        print(f"energia e bonta media nella generazione numero {n+1}: {round(media_energia,2), round(media_bonta,2)} \t differenza tra medie prima a e dopo il movimento: {round(media_energia_iniziale - media_energia, 2)}")
+        if scritte:
+            print(f"energia e bonta media nella generazione numero {n+1}: {round(media_energia,2), round(media_bonta,2)} \t differenza tra medie prima a e dopo il movimento: {round(media_energia_iniziale - media_energia, 2)}")
 
         '''generazione successiva EVOLUTIVA:''' 
-        creature = get_offsprings(creature, npop, mut_prob) #commentando questa linea tolgo tutto lo sforzo darwiniano
-
+        
+        
+        creature = get_offsprings(creature, npop, mut_prob, scritte) #commentando questa linea tolgo tutto lo sforzo darwiniano
+        #per come funziona get_offspring ora è una lista vuota se non c'è più vita, in questo caso termino
+        if creature == []:
+            return 0 #energia media dell'ultima generazione (sono tutti morti)
         """generazione successiva CASUALE:
             tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
             i più adatti e evoluzione completamente casuale. Utile per discriminare i set di parametri troppo permissivi
