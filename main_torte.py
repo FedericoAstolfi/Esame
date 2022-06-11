@@ -8,12 +8,14 @@ import copy
 import matplotlib.pyplot as plt
 
 CUT_CRSS = 4
-NTORTE = 40
+NTORTE = 60
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
+
+
 
 class Creature():
 
@@ -117,10 +119,10 @@ def movimento(creatura, ambiente):
         if ambiente[x_new][y_new] == 0:
             creatura.energia -=1
             #non modifico ambiente
-        else:
+        elif ambiente[x_new][y_new] == 1:
             #non modifico energia
             #creatura.energia +=1
-            ambiente[x_new][y_new] += 0
+            ambiente[x_new][y_new] = 0
 
 
 def crossover(dict1, dict2):
@@ -168,6 +170,8 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
     #estraggo i fitness:
     fit = [creat.energia for creat in parents]
     maxi = max(fit)
+
+    print(fit)
     
     #controllo se c'è ancora vita:
     if sum(fit) == 0:
@@ -186,10 +190,18 @@ def get_offsprings(parents): #lista di creature e prob di mutazione
             parent2 = roulette_sampling(parents,fit)
             if parent1.mosse != parent2.mosse:    #se ho preso due parenti diversi li tengo e accoppio
                 off_springs.append(parent1.mate(parent2, mut_prob))
+
             else:           #altrimenti continuo finchè non sono diversi DA VALUTARE QUESTO WHILE
-                while parent1.mosse == parent2.mosse and parent1.x == parent2.x and parent1.y == parent2.y :
+
+                '''l'idea è che possiamo usare un contatore da aggiungere come condizione del while
+                affinchè non vada avanti all'infinito:'''
+                contatore = 0
+                while parent1.mosse == parent2.mosse and parent1.x == parent2.x and parent1.y == parent2.y and contatore <=100:
                     parent1 = roulette_sampling(parents, fit)
+                    contatore += 1
                     #print("qui") #questo while viene ripetuto molte volte in alcune situazioni (per esempio se rimangono solo due creature, una con energia 1 e l'altra con energia 0.0001)
+
+                '''se a questo punto sono uscito dal while solo a causa del contatore, allora mi riproduco con lo stesso elemento'''    
                 off_springs.append(parent1.mate(parent2, mut_prob))
             
     return off_springs
@@ -309,7 +321,7 @@ if __name__=='__main__':
 
                 movimento(c, ambiente)
 
-            plt.pause(.00001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+            plt.pause(.001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
             plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
