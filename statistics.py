@@ -3,10 +3,11 @@ from matplotlib import image
 import matplotlib.pyplot as plt
 import main_torte
 
-if __name__ == '__main__':
+
+def cut_ottimo():
 
     crossovers = [i for i in range(0,16)]
-    fig, ax = plt.subplots()
+    #fig, ax = plt.subplots()
 
     energie_medie = []
 
@@ -14,13 +15,19 @@ if __name__ == '__main__':
 
         energia_media = []
 
-        for i in range(0,100):
+        for i in range(0,10):
 
-            energia_media += [main_torte.main(npop = 20, mut_prob = 0.1, ngen =  100, cut_crss = j, ntorte = 60, grafici = False)]
+            energia_media += [main_torte.main(npop = 20, mut_prob = 0.1, ngen =  10, cut_crss = j, ntorte = 80, grafici = False, scritte = True)]
 
-        energie_medie += sum(energia_media)/len(energia_media)
+        energie_medie += [sum(energia_media)/len(energia_media)]
 
 
-    ax = plt.hist(crossovers, energie_medie)
+    print(energie_medie)
+   # ax.scatter(crossovers, energie_medie)
 
-    plt.show()
+    #plt.show()
+
+
+if __name__ == '__main__':
+
+    cut_ottimo()
