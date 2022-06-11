@@ -180,6 +180,7 @@ def get_offsprings(parents, npop, mut_prob): #lista di creature e prob di mutazi
     if sum(fit) == 0:
         print("La popolazione si è estinta\n")
         quit()
+        '''dobbiamo togliere il quit e mettere un return 0'''
     
     off_springs = []
     #se è rimasto solo un genitore devo accettare che si riproduca con sè stesso, cosa che altrimenti evito
@@ -361,9 +362,10 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True):
     if grafici:
         plt.show()
 
-    print(f'ecco le mosse dell ultima generazione:\n')
-    for i in creature:
-        print(i.mosse)
+    '''questa è lenergia dell'ultima generazione, quella che in realtà non abbiamo considerato'''
+    media = sum([c.energia for c in creature])/len(creature)
+
+    return media
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
