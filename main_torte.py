@@ -8,7 +8,7 @@ import copy
 import matplotlib.pyplot as plt
 
 CUT_CRSS = 4
-NTORTE = 40
+NTORTE = 20
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
@@ -120,7 +120,7 @@ def movimento(creatura, ambiente):
         else:
             #non modifico energia
             #creatura.energia +=1
-            ambiente[x_new][y_new] += 0
+            ambiente[x_new][y_new] = 0
 
 
 def crossover(dict1, dict2):
