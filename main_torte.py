@@ -294,7 +294,8 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
     #mut_prob = args.mut_prob
     #ngen = args.ngen
 
-    fig, ax = plt.subplots() #creo la mia lista di plot
+    if grafici:
+        fig, ax = plt.subplots() #creo la mia lista di plot
 
     #creo la prima e unica popolazione casuale
     creature = [Creature() for i in range(npop)] 
@@ -371,7 +372,19 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
             hanno sempre energia 10 e non muoiono mai)"""
         #creature = [Creature(energia=best_en) for i in range(npop)]   
 
-    '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e l'ultima indicizzata da ngen-1'''
+        if sum([c.energia for c in creature])==0:
+            break
+
+
+        '''generazione successiva CASUALE:
+        tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
+        i più adatti e evoluzione completamente casuale. Utile per discriminare i set di parametri troppo permissivi
+        (cioè quelli in cui anche un approccio casuale basterebbe).
+        Scelgo di dare a tutti i figli casuali addirittura l'energia del migliore dei genitori (altrimenti
+        hanno sempre energia 10 e non muoiono mai)'''
+        #creature = [Creature(energia=best_en) for i in range(npop)]
+
+    '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e lultima indicizzata da ngen-1'''
 
     
     if grafici:
@@ -379,8 +392,9 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
     '''questa è lenergia dell'ultima generazione, quella che in realtà non abbiamo considerato'''
     media = sum([c.energia for c in creature])/len(creature)
+    goodness_media = sum([goodness(c.mosse) for c in creature])/len(creature)
 
-    return media
+    return media, goodness_media
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
