@@ -7,15 +7,30 @@ from numpy import NaN
 import argparse
 import copy
 import matplotlib.pyplot as plt
+import itertools
 
-CUT_CRSS = 4
+SIMBOLI = [-1, 0, 1]     #rappresenteranno: prensenza di veleno, nulla, presenza di torta
+
+#al posto di mettere un parametro in più nel main, lo metto qui manualmente
+SWITCH_VELENO = True                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
+
+if SWITCH_VELENO:
+    LEN_GENOMA = 3^4
+    POSSIBILITA = [p for p in itertools.product(SIMBOLI, repeat=4)]
+else:
+    LEN_GENOMA = 2^4
+    POSSIBILITA = [format(i, "04b") for i in range(0,16)]
+
+CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
 NTORTE = 60
+NVELENO = 5
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
-'''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
-POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
+'''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
+
+ 
 
 
 
@@ -60,29 +75,6 @@ class Creature():
         return c    
 
 
-
-
-
-'''facciamo che per ora lascio stare la classe ambiente, ma al suo posto uso una semplice
-matrice che mi definisco a mano ogni volta nel main: non dovrebbe essere troppo una sbatta'''
-
-class Ambiente(list):
-
-    '''creo ambiente come figlia della classe list, infatti voglio che sia una matrice. quindi non uso __init__ 
-    ma posso porre definire direttamente self come una matrice. prima la definisco come piena di zeri, poi ci metto
-    degli 1 in posizioni a caso. la condizione sul ciclo è che finchè la sommma di tutti gli elementi non è NTORTE, ovvero
-    fino a quando non ci sono NTORTE 1, il ciclo continua.
-    definendo ambiente già come lista non c'è bisogno di nessun metodo che acceda agli 0 e 1 della matrice, visto che
-    basta fare ambiente[i][j]'''
-
-    def __init__():
-
-        self = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
-
-        while np.sum(self)<NTORTE:
-            self[random.randint(0, NTORTE-1)][random.randint(0, NTORTE-1)]=1
-            #randint prende estremo dx incluso
-
 def movimento(creatura, ambiente):
 
     '''il metodo movimento prende in input la creatura e l'ambiente in cui essa
@@ -120,11 +112,16 @@ def movimento(creatura, ambiente):
         #togliamo o lasciamo invariata l'energia e togliamo eventualmente le torte:
 
         if ambiente[x_new][y_new] == 0:
-            creatura.energia -=1
+            creatura.energia -= 1
             #non modifico ambiente
+
         elif ambiente[x_new][y_new] == 1:
             #non modifico energia
             #creatura.energia +=1
+            ambiente[x_new][y_new] = 0
+
+        elif ambiente[x_new][y_new] == -1: #veleno
+            creatura.energia -= 2
             ambiente[x_new][y_new] = 0
 
 
@@ -141,7 +138,7 @@ def crossover(dict1, dict2):
         mantenuto dalla scelta del crossover) e tende a usare 2 direzioni invece di 4 (con questo crossover
         rischio meno di trovarmi con le quattro direzioni ben mischiate) """
     dict_a = { i : dict1[i] for i in POSSIBILITA[0:CUT_CRSS] } #il primo quarto da dict1
-    dict_b= { i : dict2[i] for i in POSSIBILITA[CUT_CRSS:16] } #il resto da dict2
+    dict_b= { i : dict2[i] for i in POSSIBILITA[CUT_CRSS: LEN_GENOMA] } #il resto da dict2
 
     return {**dict_a,**dict_b}  # accosto i due dictionary e restituisco il risultato
 
@@ -282,7 +279,7 @@ def goodness(dict1):
 
 # PROGRAMMA PRINCIPALE
 
-def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritte = True):
+def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True, scritte = True):
 
     #parser = argparse.ArgumentParser(description = "Istinto di sopravvivenza con algoritmi genetici")
     #parser.add_argument('popsize', help= "Numero di creature", type=int)
@@ -307,19 +304,30 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritt
 
     for n in range(ngen): 
 
+        #manca mettere veleni e plottare veleni
         #creo un ambiente random:
         ambiente = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
+        #aggiungo dei veleni
+        while np.sum(ambiente) < NVELENO:
+            ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]= -1
+        
+        #aggiungo delle torte, alcune delle quali potrebbero sovrapporsi ai veleni
         while np.sum(ambiente)<NTORTE:
-            ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]=1
+            ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]= 1
+
 
         media_energia_iniziale = sum([c.energia for c in creature]) / len(creature)
 
-        """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
+        """ci assicuriamo di dare +1 energia alle creature spawnate su una torta e -1 a quelle sul veleno"""
         #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
         for c in creature:
             if ambiente[c.x][c.y] == 1 :
                 c.energia += 1      #incremento energia del fortunato
                 ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
+
+            elif ambiente[c.x][c.y] == -1 :
+                c.energia -= 1      #decremento energia dello sfortunato
+                ambiente[c.x][c.y] = 0  # tolgo il veleno dall'ambiente
 
         if grafici:
 
