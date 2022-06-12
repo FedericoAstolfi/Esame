@@ -451,4 +451,8 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
+<<<<<<< HEAD
     main(npop= 20, mut_prob=0.1, ngen=10000, cut_crss= CUT_CRSS, ntorte= 75, grafici= False, scritte = True)
+=======
+    main(npop= 20, mut_prob=0.2, ngen=100, cut_crss= CUT_CRSS, ntorte= 60, grafici= False, scritte = True)
+>>>>>>> e89f59b02e583c9052cb6e0de03d2d591ed26c6c
