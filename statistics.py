@@ -25,13 +25,13 @@ def correlazione():
 
     '''studia correlazione tra energia e greed al viariare delle generazioni'''
 
-    energia, greed = main_torte.main(npop = 20, mut_prob = 0.1, ngen = 10000, cut_crss = main_torte.CUT_CRSS, ntorte = 75, grafici = False, scritte = False)
+    energia, greed = main_torte.main(npop = 30, mut_prob = 0.1, ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 75, grafici = False, scritte = False)
 
     #normalizzo entrambi i valori di modo che sia più facile vedere che relazione intercorre tra i due
     energy = copy.copy(energia)
     bonta = copy.copy(greed)
     energia = [i/10 for i in energy]
-    greed = [i/65 for i in greed]
+    greed = [i/15 for i in greed]
 
     fig, ax = plt.subplots()
     ax.plot(range(1, len(energia)+1), energia, color ='r', label = 'energia')
