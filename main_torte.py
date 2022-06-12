@@ -436,4 +436,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 20, mut_prob=0.2, ngen=100, cut_crss= CUT_CRSS, ntorte= 75, grafici= False, scritte = True)
+    main(npop= 20, mut_prob=0.2, ngen=100, cut_crss= CUT_CRSS, ntorte= 60, grafici= False, scritte = True)
