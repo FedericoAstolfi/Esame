@@ -23,7 +23,7 @@ else:
 
 CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
 NTORTE = 60
-NVELENO = 2
+NVELENO = 5
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
@@ -329,6 +329,10 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
     NTORTE = ntorte
     CUT_CRSS = cut_crss
 
+    gen_media_greed = []  #questi voglio poi plottarli in STATISTICS per vedere eventuali correlazioni
+    gen_media_energia = []
+    gen_media_fear = []
+
     for n in range(ngen): 
 
         #creo un ambiente random:
@@ -340,14 +344,15 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
         #aggiungo veleni, posso mettere veleno se le torte lasciano spazio!
         #per questo motivo metto max(NVELENO, NGRIGLIA**2 - NTORTE)
-        indici = []
-        for i in range(NGRIGLIA):
-            for j in range(NGRIGLIA):
-                if ambiente[i][j] == 0: #dove non ci sono torte o veleni
-                    indici += [[i, j]]
-        pos_veleno = random.sample(indici, min(NVELENO, NGRIGLIA**2 - NTORTE))
-        for i in pos_veleno:
-            ambiente[i[0]][i[1]] = 2 #codice per il veleno
+        if SWITCH_VELENO:
+            indici = []
+            for i in range(NGRIGLIA):
+                for j in range(NGRIGLIA):
+                    if ambiente[i][j] == 0: #dove non ci sono torte o veleni
+                        indici += [[i, j]]
+            pos_veleno = random.sample(indici, min(NVELENO, NGRIGLIA**2 - NTORTE))
+            for i in pos_veleno:
+                ambiente[i[0]][i[1]] = 2 #codice per il veleno
        
 
         media_energia_iniziale = sum([c.energia for c in creature]) / len(creature)
@@ -389,6 +394,15 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
         media_greed = sum([greed(c.mosse) for c in creature])/ len(creature) #media delle bontà di ogni creatura
         media_fear = sum([fear(c.mosse) for c in creature])/ len(creature)
 
+        '''in STATISTICS vorrei studiare la correlazione tra energia e greed:'''
+        #########################################################################
+        gen_media_greed += [media_greed]
+        gen_media_energia += [media_energia]
+        gen_media_fear += [media_fear]
+        #########################################################################
+        '''                                                                   '''
+
+
         if scritte:
             print(f"energia, greed e fear medie, gen numero {n+1}:\
                 {round(media_energia,2), round(media_greed,2), round(media_fear,2)} \
@@ -421,7 +435,8 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
     greed_media = sum([greed(c.mosse) for c in creature])/len(creature)
     fear_media = sum([fear(c.mosse) for c in creature])/len(creature)
 
-    return media, greed_media, fear_media
+    #return media, greed_media, fear_media
+    return gen_media_energia, gen_media_greed
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
@@ -436,4 +451,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 20, mut_prob=0.2, ngen=100, cut_crss= CUT_CRSS, ntorte= 75, grafici= False, scritte = True)
+    main(npop= 20, mut_prob=0.1, ngen=10000, cut_crss= CUT_CRSS, ntorte= 75, grafici= False, scritte = True)
