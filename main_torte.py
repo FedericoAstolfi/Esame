@@ -178,8 +178,10 @@ def get_offsprings(parents, npop, mut_prob): #lista di creature e prob di mutazi
     
     #controllo se c'è ancora vita:
     if sum(fit) == 0:
-        print("La popolazione si è estinta\n")
-        quit()
+        #print("La popolazione si è estinta\n")
+        '''al posto di quittare il programma ritorno la lista di genitori morti, quindi devo inserire
+        più avanti un controllo per arrestare il programma'''
+        return parents
         '''dobbiamo togliere il quit e mettere un return 0'''
     
     off_springs = []
@@ -295,7 +297,8 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True):
     #mut_prob = args.mut_prob
     #ngen = args.ngen
 
-    fig, ax = plt.subplots() #creo la mia lista di plot
+    if grafici:
+        fig, ax = plt.subplots() #creo la mia lista di plot
 
     #creo la prima e unica popolazione casuale
     creature = [Creature() for i in range(npop)] 
@@ -348,15 +351,21 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True):
         '''generazione successiva EVOLUTIVA:''' 
         creature = get_offsprings(creature, npop, mut_prob) #commentando questa linea tolgo tutto lo sforzo darwiniano
 
-        """generazione successiva CASUALE:
-            tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
-            i più adatti e evoluzione completamente casuale. Utile per discriminare i set di parametri troppo permissivi
-            (cioè quelli in cui anche un approccio casuale basterebbe).
-            Scelgo di dare a tutti i figli casuali addirittura l'energia del migliore dei genitori (altrimenti
-            hanno sempre energia 10 e non muoiono mai)"""
-        #creature = [Creature(energia=best_en) for i in range(npop)]   
+        '''provo a mettere un break per uscire da questo script ma non da statistics nel caso in cui i genitori siano tutti morti'''
 
-    '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e l'ultima indicizzata da ngen-1'''
+        if sum([c.energia for c in creature])==0:
+            break
+
+
+        '''generazione successiva CASUALE:
+        tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
+        i più adatti e evoluzione completamente casuale. Utile per discriminare i set di parametri troppo permissivi
+        (cioè quelli in cui anche un approccio casuale basterebbe).
+        Scelgo di dare a tutti i figli casuali addirittura l'energia del migliore dei genitori (altrimenti
+        hanno sempre energia 10 e non muoiono mai)'''
+        #creature = [Creature(energia=best_en) for i in range(npop)]
+
+    '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e lultima indicizzata da ngen-1'''
 
     
     if grafici:
@@ -364,8 +373,9 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True):
 
     '''questa è lenergia dell'ultima generazione, quella che in realtà non abbiamo considerato'''
     media = sum([c.energia for c in creature])/len(creature)
+    goodness_media = sum([goodness(c.mosse) for c in creature])/len(creature)
 
-    return media
+    return media, goodness_media
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
