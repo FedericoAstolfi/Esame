@@ -7,15 +7,30 @@ from numpy import NaN
 import argparse
 import copy
 import matplotlib.pyplot as plt
+import itertools
 
-CUT_CRSS = 4
+SIMBOLI = [2, 0, 1]     #rappresenteranno: prensenza di veleno, nulla, presenza di torta
+
+#al posto di mettere un parametro in più nel main, lo metto qui manualmente
+SWITCH_VELENO = True                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
+
+if SWITCH_VELENO:
+    LEN_GENOMA = 3**4
+    POSSIBILITA = ["".join([str(value) for value in p]) for p in itertools.product(SIMBOLI, repeat=4)]
+else:
+    LEN_GENOMA = 2**4
+    POSSIBILITA = [format(i, "04b") for i in range(0,16)]
+
+CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
 NTORTE = 60
+NVELENO = 2
 ENERGIA = 10
 NGRIGLIA = 10
 NMOSSE = 5
-'''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
-POSSIBILITA = [ format(i, "04b") for i in range(0,16)]
 
+'''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
+
+ 
 
 
 
@@ -60,29 +75,6 @@ class Creature():
         return c    
 
 
-
-
-
-'''facciamo che per ora lascio stare la classe ambiente, ma al suo posto uso una semplice
-matrice che mi definisco a mano ogni volta nel main: non dovrebbe essere troppo una sbatta'''
-
-class Ambiente(list):
-
-    '''creo ambiente come figlia della classe list, infatti voglio che sia una matrice. quindi non uso __init__ 
-    ma posso porre definire direttamente self come una matrice. prima la definisco come piena di zeri, poi ci metto
-    degli 1 in posizioni a caso. la condizione sul ciclo è che finchè la sommma di tutti gli elementi non è NTORTE, ovvero
-    fino a quando non ci sono NTORTE 1, il ciclo continua.
-    definendo ambiente già come lista non c'è bisogno di nessun metodo che acceda agli 0 e 1 della matrice, visto che
-    basta fare ambiente[i][j]'''
-
-    def __init__():
-
-        self = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
-
-        while np.sum(self)<NTORTE:
-            self[random.randint(0, NTORTE-1)][random.randint(0, NTORTE-1)]=1
-            #randint prende estremo dx incluso
-
 def movimento(creatura, ambiente):
 
     '''il metodo movimento prende in input la creatura e l'ambiente in cui essa
@@ -117,15 +109,24 @@ def movimento(creatura, ambiente):
         x_new = creatura.x
         y_new = creatura.y
 
-        #togliamo o lasciamo invariata l'energia e togliamo eventualmente le torte:
+        #togliamo o lasciamo invariata l'energia e togliamo eventualmente le torte e veleni:
 
         if ambiente[x_new][y_new] == 0:
-            creatura.energia -=1
+            creatura.energia -= 1
             #non modifico ambiente
+
         elif ambiente[x_new][y_new] == 1:
             #non modifico energia
             #creatura.energia +=1
             ambiente[x_new][y_new] = 0
+
+        elif ambiente[x_new][y_new] == 2: #veleno
+            if creatura.energia == 1:
+                creatura.energia = 0  #questo per evitare che si abbia energia -1
+                ambiente[x_new][y_new] = 0
+            else:
+                creatura.energia -= 2
+                ambiente[x_new][y_new] = 0
 
 
 def crossover(dict1, dict2):
@@ -141,7 +142,7 @@ def crossover(dict1, dict2):
         mantenuto dalla scelta del crossover) e tende a usare 2 direzioni invece di 4 (con questo crossover
         rischio meno di trovarmi con le quattro direzioni ben mischiate) """
     dict_a = { i : dict1[i] for i in POSSIBILITA[0:CUT_CRSS] } #il primo quarto da dict1
-    dict_b= { i : dict2[i] for i in POSSIBILITA[CUT_CRSS:16] } #il resto da dict2
+    dict_b= { i : dict2[i] for i in POSSIBILITA[CUT_CRSS: LEN_GENOMA] } #il resto da dict2
 
     return {**dict_a,**dict_b}  # accosto i due dictionary e restituisco il risultato
 
@@ -162,7 +163,8 @@ def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondent
     else:
         print("i fit sono tutti zero")
 
-
+#scritte gestisce i print, di default è True
+#NON CONTROLLA che parents sia tutto nullo, lo facciamo nel main
 def get_offsprings(parents, npop, mut_prob, scritte): #lista di creature e prob di mutazione
     '''rimpiazzo tutte le creature con i figli di queste, cioè npop nuove creature.
         le creature figlie hanno come energia la media delle energie dei genitori arrotondata per eccesso.
@@ -173,16 +175,6 @@ def get_offsprings(parents, npop, mut_prob, scritte): #lista di creature e prob 
     #estraggo i fitness:
     fit = [creat.energia for creat in parents]
     maxi = max(fit)
-
-    if scritte:
-        print(fit)
-    
-    #controllo se c'è ancora vita:
-    if sum(fit) == 0:
-        print("La popolazione si è estinta\n")
-        #quit()
-        '''dobbiamo togliere il quit e mettere un return 0'''
-        return []
     
     off_springs = []
     #se è rimasto solo un genitore devo accettare che si riproduca con sè stesso, cosa che altrimenti evito
@@ -237,6 +229,7 @@ def plot_creature(popolazione, ambiente, ax):
 
     ax.clear()
 
+    #coordinate sulla matrice delle torte
     torta_x = []
     torta_y = []
     for i in range(NGRIGLIA):
@@ -251,6 +244,21 @@ def plot_creature(popolazione, ambiente, ax):
 
                 torta_x += [j]
                 torta_y += [NGRIGLIA -1 - i]
+    
+    veleno_x = []
+    veleno_y = []
+    for i in range(NGRIGLIA):
+        for j in range(NGRIGLIA):
+            if ambiente[i][j] == 2:
+                '''scambio le coordinate perchè la prima mi dà la riga e la seconda la colonna
+                quindi la prima mi dà l'ordinata e la seconda l'ascissa
+                inoltre devo stare attento perchè gli elementi in teoria sono distribuiti così:
+                [0][0] [0][1] [0][2]
+                [1][0] [1][1] [1][2]
+                [2][0] [2][1] [2][2]'''
+
+                veleno_x += [j]
+                veleno_y += [NGRIGLIA -1 - i]
 
     ax.set_xlim(-0.5, NGRIGLIA)
     ax.set_ylim(-0.5, NGRIGLIA )
@@ -261,6 +269,7 @@ def plot_creature(popolazione, ambiente, ax):
     a  0 2 4 6 8, mentre io voglio che mi metta una linea per ogni numero 0 1 2 3 4 5 ...
     se non mi sono spiegato prova a commentare momentaneamente myticks e plt.xtricks plt.yticks'''
     ax.scatter(torta_x, torta_y, color = 'b') #plotto i punti con scatter
+    ax.scatter(veleno_x, veleno_y, color = 'r', marker = 'x') #plotto i punti con scatter
     plt.grid(linewidth=0.5, color = 'g', linestyle = '--') #tiro su una griglia 
 
     for i in range(len(popolazione)): #printo tutte le creature, che vengono messe nella loro posizione iniziale giusta
@@ -268,21 +277,35 @@ def plot_creature(popolazione, ambiente, ax):
         
 
             
-def goodness(dict1):
-    """dato il dizionario di una creatura conta in quante delle 15 possibilità essa vada su una torta quando c'è"""
+def greed(dict):
+    """dato il dizionario di una creatura conta in quante delle 15 (o 65 con il veleno) possibilità essa vada su una torta quando c'è"""
     count = 0
-    chiavi = list(dict1.keys())
+    chiavi = list(dict.keys())
     for k in chiavi: #scorro sulle chiavi
         for i in range(0,4): #scorro sui 4 bit
-            if int(k[i]) == 1 and dict1[k] == i:
+            if int(k[i]) == 1 and dict[k] == i:
                 count += 1
                 break
     return count
 
+def fear(dict): #maggiore è fear migliore è la creatura
+    """conta quante volte la creatura EVITA il veleno quando c'è: minimo 1 max 65"""
+    count = 0
+    chiavi = list(dict.keys())
+
+    for k in chiavi: #scorro sulle chiavi
+        vel = [i for i in range(len(k)) if k[i] == '2'] #estraggo gli indici dei veleni
+        if int(dict[k]) in vel:
+            count += 1 
+    return count
+        
+
+
+
 
 # PROGRAMMA PRINCIPALE
 
-def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritte = True):
+def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True, scritte = True):
 
     #parser = argparse.ArgumentParser(description = "Istinto di sopravvivenza con algoritmi genetici")
     #parser.add_argument('popsize', help= "Numero di creature", type=int)
@@ -310,17 +333,35 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritt
 
         #creo un ambiente random:
         ambiente = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
+        
+        #aggiungo delle torte
         while np.sum(ambiente)<NTORTE:
-            ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]=1
+            ambiente[random.randint(0, NGRIGLIA-1)][random.randint(0, NGRIGLIA-1)]= 1
+
+        #aggiungo veleni, posso mettere veleno se le torte lasciano spazio!
+        #per questo motivo metto max(NVELENO, NGRIGLIA**2 - NTORTE)
+        indici = []
+        for i in range(NGRIGLIA):
+            for j in range(NGRIGLIA):
+                if ambiente[i][j] == 0: #dove non ci sono torte o veleni
+                    indici += [[i, j]]
+        pos_veleno = random.sample(indici, min(NVELENO, NGRIGLIA**2 - NTORTE))
+        for i in pos_veleno:
+            ambiente[i[0]][i[1]] = 2 #codice per il veleno
+       
 
         media_energia_iniziale = sum([c.energia for c in creature]) / len(creature)
 
-        """ci assicuriamo di dare +1 energia alle creature spawnate su una torta"""
+        """ci assicuriamo di dare +1 energia alle creature spawnate su una torta e -1 a quelle sul veleno"""
         #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
         for c in creature:
             if ambiente[c.x][c.y] == 1 :
                 c.energia += 1      #incremento energia del fortunato
                 ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
+
+            elif ambiente[c.x][c.y] == 2 :
+                c.energia -= 1      #decremento energia dello sfortunato
+                ambiente[c.x][c.y] = 0  # tolgo il veleno dall'ambiente
 
         if grafici:
 
@@ -345,17 +386,22 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritt
         energie = [c.energia for c in creature]
         best_en = max(energie)
         media_energia = sum(energie) / len(creature)
-        media_bonta = sum([goodness(c.mosse) for c in creature])/ len(creature) #media delle bontà di ogni creatura
+        media_greed = sum([greed(c.mosse) for c in creature])/ len(creature) #media delle bontà di ogni creatura
+        media_fear = sum([fear(c.mosse) for c in creature])/ len(creature)
+
         if scritte:
-            print(f"energia e bonta media nella generazione numero {n+1}: {round(media_energia,2), round(media_bonta,2)} \t differenza tra medie prima a e dopo il movimento: {round(media_energia_iniziale - media_energia, 2)}")
+            print(f"energia, greed e fear medie, gen numero {n+1}:\
+                {round(media_energia,2), round(media_greed,2), round(media_fear,2)} \
+                 \t differenza tra medie prima a e dopo il movimento: {round(media_energia_iniziale - media_energia, 2)}")
 
         '''generazione successiva EVOLUTIVA:''' 
         
-        
+        if sum([c.energia for c in creature])==0:
+            print("estinzione")
+            break
         creature = get_offsprings(creature, npop, mut_prob, scritte) #commentando questa linea tolgo tutto lo sforzo darwiniano
         #per come funziona get_offspring ora è una lista vuota se non c'è più vita, in questo caso termino
-        if creature == []:
-            return 0 #energia media dell'ultima generazione (sono tutti morti)
+
         """generazione successiva CASUALE:
             tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
             i più adatti e evoluzione completamente casuale. Utile per discriminare i set di parametri troppo permissivi
@@ -363,18 +409,6 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritt
             Scelgo di dare a tutti i figli casuali addirittura l'energia del migliore dei genitori (altrimenti
             hanno sempre energia 10 e non muoiono mai)"""
         #creature = [Creature(energia=best_en) for i in range(npop)]   
-
-        if sum([c.energia for c in creature])==0:
-            break
-
-
-        '''generazione successiva CASUALE:
-        tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
-        i più adatti e evoluzione completamente casuale. Utile per discriminare i set di parametri troppo permissivi
-        (cioè quelli in cui anche un approccio casuale basterebbe).
-        Scelgo di dare a tutti i figli casuali addirittura l'energia del migliore dei genitori (altrimenti
-        hanno sempre energia 10 e non muoiono mai)'''
-        #creature = [Creature(energia=best_en) for i in range(npop)]
 
     '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e lultima indicizzata da ngen-1'''
 
@@ -384,9 +418,10 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritt
 
     '''questa è lenergia dell'ultima generazione, quella che in realtà non abbiamo considerato'''
     media = sum([c.energia for c in creature])/len(creature)
-    goodness_media = sum([goodness(c.mosse) for c in creature])/len(creature)
+    greed_media = sum([greed(c.mosse) for c in creature])/len(creature)
+    fear_media = sum([fear(c.mosse) for c in creature])/len(creature)
 
-    return media, goodness_media
+    return media, greed_media, fear_media
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
@@ -398,3 +433,7 @@ def main(npop, mut_prob, ngen, cut_crss = 4, ntorte = 60, grafici = True, scritt
 
 """ al momento, dagli esperimenti, non mi sembra evidente l'importanza delle mutazioni: anche azzerandole c'è progresso.
     rischi di massimi locali però?"""
+
+if __name__ == '__main__':
+
+    main(npop= 20, mut_prob=0.2, ngen=100, cut_crss= CUT_CRSS, ntorte= 75, grafici= False, scritte = True)
