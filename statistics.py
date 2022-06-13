@@ -25,7 +25,8 @@ def correlazione():
 
     '''studia correlazione tra energia e greed al viariare delle generazioni'''
 
-    energia, greed = main_torte.main(npop = 30, mut_prob = 0.1, ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 75, grafici = False, scritte = False)
+    energia, greed = main_torte.main(npop = 30, mut_prob = 0.1,\
+                         ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 75, grafici = False, scritte = False)
 
     #normalizzo entrambi i valori di modo che sia più facile vedere che relazione intercorre tra i due
     energy = copy.copy(energia)
@@ -40,7 +41,21 @@ def correlazione():
     ax.legend()
     plt.show()
 
+
+def valore_atteso_greed(n):
+    """il valore atteso della variabile aleatoria 'greed di una creatura' è 8 (27 per veleno = true), quanta variabilità c'è?
+        n numero della popolazione cauale,  visualizza il valore atteso teorico e le greed di ognuna delle n creature"""
+    creature = [main_torte.Creature() for i in range(n)] 
+    greed = [main_torte.greed(c.mosse) for c in creature]
+    fig, ax = plt.subplots()
+    ax.plot(range(1,n+1), greed)
+    ax.plot(range(1,n+1), [27]*n)
+    ax.set_xlabel('popolazione')
+    ax.set_ylabel('greed')
+    ax.set_title("variabilità greed iniziale")
+    plt.show()
+
 if __name__ == '__main__':
-    correlazione()
+    valore_atteso_greed(100)
 
 
