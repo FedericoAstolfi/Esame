@@ -12,7 +12,7 @@ import itertools
 SIMBOLI = [2, 0, 1]     #rappresenteranno: prensenza di veleno, nulla, presenza di torta
 
 #al posto di mettere un parametro in più nel main, lo metto qui manualmente
-SWITCH_VELENO = False                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
+SWITCH_VELENO = True                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
 
 if SWITCH_VELENO:
     LEN_GENOMA = 3**4
