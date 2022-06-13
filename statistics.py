@@ -55,7 +55,14 @@ def valore_atteso_greed(n):
     ax.set_title("variabilità greed iniziale")
     plt.show()
 
+    
+
+
+
+
+
+
 if __name__ == '__main__':
-    valore_atteso_greed(100)
+    #valore_atteso_greed(100)
 
 
