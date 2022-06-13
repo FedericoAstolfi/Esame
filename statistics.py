@@ -55,6 +55,17 @@ def valore_atteso_greed(n):
     ax.set_title("variabilità greed iniziale")
     plt.show()
 
+
+def rapporto_minimo():
+
+    for i in range(20,50): #ciclo da 20 individui a 50
+        for j in range(30,90,3): #aumento le torte
+            rate = 0
+            for _ in range(100): #eseguo 100 volte il main
+                rate += main_torte.main(npop = i, mut_prob= 0.1, ngen = 100, \
+                                        cut_crss = 8, ntorte = j, grafici = False, scritte = False)
+            rate = rate/100 #si può fare con gli interi?
+
 if __name__ == '__main__':
     valore_atteso_greed(100)
 
