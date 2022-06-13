@@ -12,7 +12,7 @@ import itertools
 SIMBOLI = [2, 0, 1]     #rappresenteranno: prensenza di veleno, nulla, presenza di torta
 
 #al posto di mettere un parametro in più nel main, lo metto qui manualmente
-SWITCH_VELENO = True                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
+SWITCH_VELENO = False                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
 
 if SWITCH_VELENO:
     LEN_GENOMA = 3**4
@@ -173,8 +173,8 @@ def get_offsprings(parents, npop, mut_prob, scritte): #lista di creature e prob 
         di mating tra una creatura con sè stessa '''
      
     #estraggo i fitness:
-    #fit = [creat.energia for creat in parents]
-    fit = [greed(creat.mosse) for creat in parents]
+    fit = [creat.energia for creat in parents]
+    #fit = [greed(creat.mosse) for creat in parents]
     maxi = max(fit)
     
     off_springs = []
@@ -366,8 +366,12 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
                 ambiente[c.x][c.y] = 0  # tolgo la torta dall'ambiente
 
             elif ambiente[c.x][c.y] == 2 :
-                c.energia -= 1      #decremento energia dello sfortunato
-                ambiente[c.x][c.y] = 0  # tolgo il veleno dall'ambiente
+                if c.energia == 1:
+                    c.energia = 0
+                    ambiente[c.x][c.y] = 0
+                else:
+                    c.energia -= 1      #decremento energia dello sfortunato
+                    ambiente[c.x][c.y] = 0  # tolgo il veleno dall'ambiente
 
         if grafici:
 
@@ -437,7 +441,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
     fear_media = sum([fear(c.mosse) for c in creature])/len(creature)
 
     #return media, greed_media, fear_media
-    return gen_media_energia, gen_media_greed
+    #return gen_media_energia, gen_media_greed
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
@@ -452,4 +456,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 20, mut_prob=0.1, ngen=1000, cut_crss= CUT_CRSS, ntorte= 75, grafici= False, scritte = True)
+    main(npop= 20, mut_prob=0.1, ngen=1000, cut_crss= CUT_CRSS, ntorte= 30, grafici= True, scritte = True)
