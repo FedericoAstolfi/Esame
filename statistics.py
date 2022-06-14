@@ -26,7 +26,7 @@ def correlazione():
     '''studia correlazione tra energia e greed al viariare delle generazioni'''
 
     energia, greed = main_torte.main(npop = 30, mut_prob = 0.1,\
-                         ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 75, grafici = False, scritte = False)
+                         ngen = 100, cut_crss = main_torte.CUT_CRSS, ntorte = 80, grafici = False, scritte = False)
 
     #normalizzo entrambi i valori di modo che sia più facile vedere che relazione intercorre tra i due
     energy = copy.copy(energia)
@@ -37,6 +37,7 @@ def correlazione():
     fig, ax = plt.subplots()
     ax.plot(range(1, len(energia)+1), energia, color ='r', label = 'energia')
     ax.set_xlabel('generazioni')
+    ax.set_ylabel('')
     ax.plot(range(1,len(greed)+1), greed, color = 'g', label = 'greed')
     ax.legend()
     plt.show()
@@ -66,8 +67,50 @@ def rapporto_minimo():
                                         cut_crss = 8, ntorte = j, grafici = False, scritte = False)
             rate = rate/100 #si può fare con gli interi?
 
+<<<<<<< HEAD
 if __name__ == '__main__':
     #valore_atteso_greed(100)
     pass
 
 
+=======
+    
+def test_rapporto():
+    fig, ax = plt.subplots()
+    lista_torte = [] #qua ci metto il numero più basso di torte per cui la popolazione di i elementi raggiunge rate 0.6 (oppure arriva alle 90 torte)
+    for i in range(20,40,2):
+        '''fisso un numero di creature'''
+        rate = 0
+        torte = 57
+        while rate < 0.6 and torte < 90:
+            '''questa è la soglia del rate che vorrei superare, ovvero 6 popolazioni su 10 arrivano alla centesima generazione'''
+            rate = 0 #azzero il rate a ogni nuovo ciclo se no ho le informazioni vecchie
+            torte +=3
+            for _ in range(0,100):
+                rate += main_torte.main(npop= i, mut_prob=0.1, ngen=100, cut_crss= main_torte.CUT_CRSS, ntorte= torte, grafici= False, scritte = False)
+                print(rate)
+            rate = rate / 100
+            print(rate)
+        if rate < 0.6:
+            print(f'con {i} individui non si raggiunge mai la soglia minima di rate per arrivare alla 100 esima generazione ')
+        else:
+            print(f'con {i} individui il rate delle volte in cui si raggiunge la 100 esima generazione è {rate}, e il numero minimo di torte con cui ciò accade è {torte}')
+        lista_torte += [torte]
+
+    ax.bar(range(20,40,2), lista_torte)
+    ax.set_xlabel('numero creature')
+    ax.set_ylabel('numero torte necessarie')
+    ax.set_title('relazione creature/torte per sopravvivenza')
+    plt.show()
+
+
+
+
+
+
+
+
+if __name__ == '__main__':
+    #test_rapporto()
+    correlazione()
+>>>>>>> b1a0dc163c17e09f9574d9268d33f6fb6f1abe12
