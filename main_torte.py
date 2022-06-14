@@ -387,7 +387,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
             if grafici:
 
-                plt.pause(.001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+                plt.pause(.5) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
                 plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
@@ -417,8 +417,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
         '''generazione successiva EVOLUTIVA:''' 
         
         if sum([c.energia for c in creature])==0:
-            if scritte:
-                print("estinzione")
+            print("estinzione")
             break
         creature = get_offsprings(creature, npop, mut_prob, scritte) #commentando questa linea tolgo tutto lo sforzo darwiniano
         #per come funziona get_offspring ora è una lista vuota se non c'è più vita, in questo caso termino
@@ -446,20 +445,12 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
     greed_media = sum([greed(c.mosse) for c in creature])/len(creature)
     fear_media = sum([fear(c.mosse) for c in creature])/len(creature)
 
-    #return media, greed_media, fear_media
-<<<<<<< HEAD
-    #return gen_media_energia, gen_media_greed
     
-    #return 0 se è arrivato alla ngen generazione
-    print(contatore)
-    return contatore
-=======
+    #return media, greed_media, fear_media
     return gen_media_energia, gen_media_greed
     
-    #return 0 se è arrivato alla ngen generazione
-    
+    #return 1 se è arrivato alla ngen generazione altrimenti 0
     #return contatore
->>>>>>> b1a0dc163c17e09f9574d9268d33f6fb6f1abe12
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
@@ -474,4 +465,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 20, mut_prob=0.1, ngen=50, cut_crss= CUT_CRSS, ntorte= 60, grafici= False, scritte = True)
+    main(npop= 20, mut_prob=0.1, ngen=50, cut_crss= CUT_CRSS, ntorte= 10, grafici= True, scritte = True)
