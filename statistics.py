@@ -55,6 +55,7 @@ def valore_atteso_greed(n):
     ax.set_title("variabilità greed iniziale")
     plt.show()
 
+<<<<<<< HEAD
 
 def rapporto_minimo():
 
@@ -65,8 +66,16 @@ def rapporto_minimo():
                 rate += main_torte.main(npop = i, mut_prob= 0.1, ngen = 100, \
                                         cut_crss = 8, ntorte = j, grafici = False, scritte = False)
             rate = rate/100 #si può fare con gli interi?
+=======
+    
+
+
+
+
+
+>>>>>>> 0e65d1ae8b38b96ae5aaf2dc168c37e194fb30b1
 
 if __name__ == '__main__':
-    valore_atteso_greed(100)
+    #valore_atteso_greed(100)
 
 
