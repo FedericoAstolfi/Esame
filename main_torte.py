@@ -447,13 +447,10 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
     #return media, greed_media, fear_media
     #return gen_media_energia, gen_media_greed
-<<<<<<< HEAD
     
     #return 0 se è arrivato alla ngen generazione
     print(contatore)
     return contatore
-=======
->>>>>>> 0e65d1ae8b38b96ae5aaf2dc168c37e194fb30b1
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
@@ -468,8 +465,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-<<<<<<< HEAD
     main(npop= 20, mut_prob=0.1, ngen=50, cut_crss= CUT_CRSS, ntorte= 60, grafici= False, scritte = True)
-=======
-    main(npop= 20, mut_prob=0.1, ngen=1000, cut_crss= CUT_CRSS, ntorte= 30, grafici= True, scritte = True)
->>>>>>> 0e65d1ae8b38b96ae5aaf2dc168c37e194fb30b1
