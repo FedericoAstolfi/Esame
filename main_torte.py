@@ -417,7 +417,8 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
         '''generazione successiva EVOLUTIVA:''' 
         
         if sum([c.energia for c in creature])==0:
-            print("estinzione")
+            if scritte:
+                print("estinzione")
             break
         creature = get_offsprings(creature, npop, mut_prob, scritte) #commentando questa linea tolgo tutto lo sforzo darwiniano
         #per come funziona get_offspring ora è una lista vuota se non c'è più vita, in questo caso termino
@@ -446,11 +447,19 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
     fear_media = sum([fear(c.mosse) for c in creature])/len(creature)
 
     #return media, greed_media, fear_media
+<<<<<<< HEAD
     #return gen_media_energia, gen_media_greed
     
     #return 0 se è arrivato alla ngen generazione
     print(contatore)
     return contatore
+=======
+    return gen_media_energia, gen_media_greed
+    
+    #return 0 se è arrivato alla ngen generazione
+    
+    #return contatore
+>>>>>>> b1a0dc163c17e09f9574d9268d33f6fb6f1abe12
 
 
 """risultati interssanti con 20 pop_size 0.4 mut_prob (anche con 0.1 si ottengono risultati simili di crescita
