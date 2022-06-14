@@ -56,6 +56,29 @@ def valore_atteso_greed(n):
     plt.show()
 
     
+def test_rapporto():
+    fig, ax = plt.subplots()
+    lista_torte = [] #qua ci metto il numero più basso di torte per cui la popolazione di i elementi raggiunge rate 0.6 (oppure arriva alle 90 torte)
+    for i in range(20,50):
+        '''fisso un numero di creature'''
+        rate = 0
+        torte = 30
+        while rate >= 0.6 | torte < 90:
+            '''questa è la soglia del rate che vorrei superare, ovvero 6 popolazioni su 10 arrivano alla centesima generazione'''
+            rate = 0 #azzero il rate a ogni nuovo ciclo se no ho le informazioni vecchie
+            torte +=1
+            for _ in range(0,100):
+                rate += main_torte.main(npop= i, mut_prob=0.1, ngen=100, cut_crss= main_torte.CUT_CRSS, ntorte= torte, grafici= False, scritte = False)
+            rate = [e/100 for e in rate]
+        if rate < 0.6:
+            print(f'con {i} individui non si raggiunge mai la soglia minima di rate per arrivare alla 100 esima generazione ')
+        else:
+            print(f'con {i} individui il rate delle volte in cui si raggiunge la 100 esima generazione è {rate},\
+                e il numero minimo di torte con cui ciò accade è {torte}')
+        lista_torte += [torte]
+        ax.bar(range(20,50), lista_torte)
+    plt.show()
+
 
 
 
@@ -63,6 +86,5 @@ def valore_atteso_greed(n):
 
 
 if __name__ == '__main__':
+    pass
     #valore_atteso_greed(100)
-
-
