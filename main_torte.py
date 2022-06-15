@@ -12,7 +12,7 @@ import itertools
 SIMBOLI = [2, 0, 1]     #rappresenteranno: prensenza di veleno, nulla, presenza di torta
 
 #al posto di mettere un parametro in più nel main, lo metto qui manualmente
-SWITCH_VELENO = False                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
+SWITCH_VELENO = True                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
 
 if SWITCH_VELENO:
     LEN_GENOMA = 3**4
@@ -23,9 +23,9 @@ else:
 
 CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
 NTORTE = 60
-NVELENO = 5
+NVELENO = 60
 ENERGIA = 10
-NGRIGLIA = 10
+NGRIGLIA = 15
 NMOSSE = 5
 
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
@@ -289,7 +289,7 @@ def greed(dict):
                 break
     return count
 
-def fear(dict): #maggiore è fear migliore è la creatura
+'''def fear(dict): #maggiore è fear migliore è la creatura
     """conta quante volte la creatura EVITA il veleno quando c'è: minimo 1 max 65"""
     count = 0
     chiavi = list(dict.keys())
@@ -298,8 +298,20 @@ def fear(dict): #maggiore è fear migliore è la creatura
         vel = [i for i in range(len(k)) if k[i] == '2'] #estraggo gli indici dei veleni
         if int(dict[k]) in vel:
             count += 1 
-    return count
+    return count'''
         
+def fear(dict):
+    '''notare che in questo caso il massimo di fear è 64, perchè 0000 e 2222 non mi danno +1 nel count'''
+    count = 0
+    chiavi = list(dict.keys())
+    for k in chiavi:
+        if '2' in k:    
+            for i in range(0,4):
+                if dict[k]==i and int(k[i]) != 2:
+                    count +=1
+                    break
+    return count
+
 
 
 
@@ -447,7 +459,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
     
     #return media, greed_media, fear_media
-    return gen_media_energia, gen_media_greed
+    return gen_media_energia, gen_media_greed, gen_media_fear
     
     #return 1 se è arrivato alla ngen generazione altrimenti 0
     #return contatore
