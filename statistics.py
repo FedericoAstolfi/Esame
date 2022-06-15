@@ -25,19 +25,26 @@ def correlazione():
 
     '''studia correlazione tra energia e greed al viariare delle generazioni'''
 
-    energia, greed = main_torte.main(npop = 24, mut_prob = 0.1,\
-                         ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 72, grafici = False, scritte = False)
+    energia, greed, fear = main_torte.main(npop = 60, mut_prob = 0.1,\
+                         ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 150, grafici = False, scritte = False)
 
     #normalizzo entrambi i valori di modo che sia più facile vedere che relazione intercorre tra i due
     energy = copy.copy(energia)
     bonta = copy.copy(greed)
+    paura = copy.copy(fear)
     energia = [i/10 for i in energy]
-    greed = [i/15 for i in greed]
+    greed = [i/65 for i in greed]
+    '''di solito fear lo tolgo'''
+    fear = [i/64 for i in paura]
 
     fig, ax = plt.subplots()
     ax.plot(range(1, len(energia)+1), energia, color ='r', label = 'energia')
     ax.set_xlabel('generazioni')
     ax.plot(range(1,len(greed)+1), greed, color = 'g', label = 'greed')
+    ax.plot(range(1,len(greed)+1),[0.4]*(len(greed)),'b', label = 'media casuale greed')
+    '''di solito fear lo tolgo'''
+    ax.plot(range(1,len(fear)+1),fear, color = 'orange', label = 'fear')
+    ax.plot(range(1,len(fear)+1), [0.59]*len(fear), color= 'pink', label = 'media casuale fear')
     ax.legend()
     plt.show()
 
@@ -55,15 +62,6 @@ def valore_atteso_greed(n):
     ax.set_title("variabilità greed iniziale")
     plt.show()
 
-def rapporto_minimo():
-
-    for i in range(20,50): #ciclo da 20 individui a 50
-        for j in range(30,90,3): #aumento le torte
-            rate = 0
-            for _ in range(100): #eseguo 100 volte il main
-                rate += main_torte.main(npop = i, mut_prob= 0.1, ngen = 100, \
-                                        cut_crss = 8, ntorte = j, grafici = False, scritte = False)
-            rate = rate/100 #si può fare con gli interi?
 
     
 def test_rapporto():
@@ -73,7 +71,7 @@ def test_rapporto():
         '''fisso un numero di creature'''
         rate = 0
         torte = 30
-        while rate >= 0.6 | torte < 90:
+        while rate < 0.6 and torte < 90:
             '''questa è la soglia del rate che vorrei superare, ovvero 6 popolazioni su 10 arrivano alla centesima generazione'''
             rate = 0 #azzero il rate a ogni nuovo ciclo se no ho le informazioni vecchie
             torte +=1
