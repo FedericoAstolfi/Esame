@@ -69,7 +69,7 @@ class TestMain_Torte(unittest.TestCase):
         
         #test del crossover 1/4 + 3/4
         #genero due dict casualmente {i : random.randint(0, 3) for i in POSSIBILITA}
-        dict1  = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 2, '0101': 4, '0110': 0, '0111': 4, '1000': 2, '1001': 4, '1010': 0, '1011': 4, '1100': 4, '1101': 4, '1110': 1, '1111': 0}
+        dict1  = {'0000': 4, '0010': 2, '0010': 1, '0011': 1, '0100': 2, '0101': 4, '0110': 0, '0111': 4, '1000': 2, '1001': 4, '1010': 0, '1011': 4, '1100': 4, '1101': 4, '1110': 1, '1111': 0}
         dict2 = {'0000': 3, '0001': 4, '0010': 1, '0011': 3, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
         hand_made = {'0000': 4, '0001': 2, '0010': 1, '0011': 1, '0100': 0, '0101': 0, '0110': 3, '0111': 4, '1000': 1, '1001': 4, '1010': 3, '1011': 2, '1100': 2, '1101': 1, '1110': 1, '1111': 2}
         self.assertEqual(hand_made, main_torte.crossover(dict1, dict2))"""
@@ -83,7 +83,7 @@ class TestMain_Torte(unittest.TestCase):
         fit = [c.energia for c in lista]
         self.assertEqual(lista[2], main_torte.roulette_sampling(lista, fit))
     
-    def test_mate(self):
+    '''def test_mate(self):
         #genero due dict casualmente {i : random.randint(0, 3) for i in POSSIBILITA}
         dict1 = {'0000': 0, '0001': 0, '0010': 2, '0011': 1, '0100': 1, '0101': 2, '0110': 0, '0111': 2, '1000': 1, '1001': 1, '1010': 0, '1011': 2, '1100': 2, '1101': 2, '1110': 3, '1111': 1}
         dict2 = {'0000': 3, '0001': 0, '0010': 3, '0011': 0, '0100': 2, '0101': 3, '0110': 1, '0111': 2, '1000': 1, '1001': 1, '1010': 0, '1011': 2, '1100': 3, '1101': 2, '1110': 1, '1111': 2}
@@ -102,14 +102,19 @@ class TestMain_Torte(unittest.TestCase):
         self.assertEqual(8, ris.energia) #controllo cehe l'energia del figlio diventi la media dei genitori arrotondata per eccesso
 
         mut_son = c1.mate(c2,1)
-        self.assertNotEqual(figlio.mosse, mut_son.mosse)
+        self.assertNotEqual(figlio.mosse, mut_son.mosse)'''
 
-    def test_goodness(self):
+    '''def test_goodness(self):
         #genero dict casualmente {i : random.randint(0, 3) for i in POSSIBILITA}
         dict = {'0000': 2, '0001': 3, '0010': 0, '0011': 0, '0100': 3, '0101': 3, '0110': 3, '0111': 3, '1000': 1, '1001': 1, '1010': 0, '1011': 2, '1100': 1, '1101': 3, '1110': 1, '1111': 3}
         #conto:  no         si          no          no          no      si          no          si          no          no          si      si         si           si          si          si
-        self.assertEqual(9, main_torte.goodness(dict))
+        self.assertEqual(9, main_torte.goodness(dict))'''
 
+
+    def test_fear(self):
+
+        dict = {'0020': 2, '0022': 3, '0200': 0, '0201': 0, '2002': 3, '2020': 3, '2010': 3, '2011': 3, '1200': 1, '1020': 1, '1200': 0, '1201': 2, '1120': 1, '1120': 3, '1112': 0, '1211': 3}
+        self.assertEqual(11,main_torte.fear(dict))
 
 if __name__ == '__main__':
 
