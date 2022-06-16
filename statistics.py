@@ -25,8 +25,13 @@ def correlazione():
 
     '''studia correlazione tra energia e greed al viariare delle generazioni'''
 
+<<<<<<< Updated upstream
     energia, greed, fear = main_torte.main(npop = 60, mut_prob = 0.1,\
                          ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 150, grafici = False, scritte = False)
+=======
+    energia, greed = main_torte.main(npop = 38, mut_prob = 0.1,\
+                         ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 87, grafici = False, scritte = False)
+>>>>>>> Stashed changes
 
     #normalizzo entrambi i valori di modo che sia più facile vedere che relazione intercorre tra i due
     energy = copy.copy(energia)
