@@ -26,7 +26,11 @@ NTORTE = 60
 NVELENO = 60
 ENERGIA = 10
 NGRIGLIA = 15
+<<<<<<< Updated upstream
 NMOSSE = 5
+=======
+NMOSSE = 4
+>>>>>>> Stashed changes
 
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 
@@ -440,7 +444,8 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
             (cioè quelli in cui anche un approccio casuale basterebbe).
             Scelgo di dare a tutti i figli casuali addirittura l'energia del migliore dei genitori (altrimenti
             hanno sempre energia 10 e non muoiono mai)"""
-        #creature = [Creature(energia=best_en) for i in range(npop)] 
+        
+        #creature = [Creature(energia= int(media_energia)) for i in range(npop)] 
         
 
         if n == ngen-1:
@@ -477,4 +482,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 20, mut_prob=0.1, ngen=50, cut_crss= CUT_CRSS, ntorte= 10, grafici= True, scritte = True)
+    main(npop= 20, mut_prob=0.1, ngen=20, cut_crss= CUT_CRSS, ntorte= 69, grafici= True, scritte = True)
