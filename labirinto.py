@@ -23,10 +23,10 @@ else:
 
 CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
 NTORTE = 60
-NVELENO = 125
-ENERGIA = 30
-NGRIGLIA = 15
-NMOSSE = 2
+NVELENO = 90
+ENERGIA = 10
+NGRIGLIA = 20
+NMOSSE = 4
 
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 
@@ -71,7 +71,7 @@ class Creature():
         c = Creature(mosse_figlio)
         #arrotondo per eccesso l'energia del figlio
         a = round(((self.energia + other.energia)*0.5)+0.1)  # vista la natura del problema aggiungere 0.1 mi assicura di arrotondare per eccesso
-        c.energia = 10#int(a)  #converto in int per sicurezza
+        c.energia = int(a)  #converto in int per sicurezza
         return c    
 
 
@@ -219,8 +219,8 @@ def get_offsprings(parents, npop, mut_prob, scritte): #lista di creature e prob 
         di mating tra una creatura con sè stessa '''
      
     #estraggo i fitness:
-    #fit = [creat.energia for creat in parents]
-    fit = [fear(creat.mosse) for creat in parents]
+    fit = [creat.energia for creat in parents]
+    #fit = [fear(creat.mosse) for creat in parents]
     maxi = max(fit)
     
     off_springs = []
@@ -494,7 +494,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
         max_fear= max([fear(c.mosse) for c in creature ])
         max_fear_ind = [fear(c.mosse) for c in creature].index(max_fear)
         teseo = creature[max_fear_ind]
-        print(f"fear max: {fear(teseo.mosse)}")
+        #print(f"fear max: {fear(teseo.mosse)}")
         if n == ngen-1:
             contatore = 1
 
@@ -575,4 +575,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 20, mut_prob=0.2, ngen=1000, cut_crss= CUT_CRSS, ntorte= 100, grafici= False, scritte = True)
+    main(npop= 50, mut_prob=0.2, ngen=500, cut_crss= CUT_CRSS, ntorte= 250, grafici= False, scritte = False)
