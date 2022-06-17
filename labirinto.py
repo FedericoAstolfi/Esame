@@ -25,8 +25,8 @@ CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se 
 NTORTE = 60
 NVELENO = 125
 ENERGIA = 30
-NGRIGLIA = 15
-NMOSSE = 2
+NGRIGLIA = 20
+NMOSSE = 3
 
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 
@@ -173,7 +173,8 @@ def movimento_labirinto(creatura, ambiente):
 
     elif ambiente[x_new][y_new] == 2: #veleno
         print("Teseo ha provato a scavalcare il labirinto")
-        quit()
+        #quit()
+        creatura.energia = 0
 
 def crossover(dict1, dict2):
     """ ad una creatura per essere buona basta quasi solo andare verso una torta quando ce n'è una,
@@ -220,7 +221,7 @@ def get_offsprings(parents, npop, mut_prob, scritte): #lista di creature e prob 
      
     #estraggo i fitness:
     #fit = [creat.energia for creat in parents]
-    fit = [fear(creat.mosse) for creat in parents]
+    fit = [fear(creat.mosse)*greed(creat.mosse) for creat in parents]
     maxi = max(fit)
     
     off_springs = []
@@ -447,7 +448,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
             if grafici:
 
-                plt.pause(.5) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+                plt.pause(1) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
                 plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
@@ -455,7 +456,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
                 plt.title(f' generazione numero {n+1}')
 
         energie = [c.energia for c in creature]
-        best_en = max(energie)
+        #best_en = max(energie)
         media_energia = sum(energie) / len(creature)
         media_greed = sum([greed(c.mosse) for c in creature])/ len(creature) #media delle bontà di ogni creatura
         media_fear = sum([fear(c.mosse) for c in creature])/ len(creature)
@@ -479,8 +480,14 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
         if sum([c.energia for c in creature])==0:
             print("estinzione")
             break
+
+
+
         creature = get_offsprings(creature, npop, mut_prob, scritte) #commentando questa linea tolgo tutto lo sforzo darwiniano
         #per come funziona get_offspring ora è una lista vuota se non c'è più vita, in questo caso termino
+
+        
+
 
         """generazione successiva CASUALE:
             tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
@@ -491,10 +498,19 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
         
         #creature = [Creature(energia= int(media_energia)) for i in range(npop)] 
         
-        max_fear= max([fear(c.mosse) for c in creature ])
-        max_fear_ind = [fear(c.mosse) for c in creature].index(max_fear)
-        teseo = creature[max_fear_ind]
+        maxi= max([fear(c.mosse)*greed(c.mosse) for c in creature ])
+        max_ind = [fear(c.mosse)*greed(c.mosse) for c in creature].index(maxi)
+
+
+        if fear(teseo.mosse)*greed(teseo.mosse) < maxi:
+            teseo = creature[max_ind]
         print(f"fear max: {fear(teseo.mosse)}")
+
+        '''SOLO PER IL CASO DEL LABIRINTO = BREAK SE GREED * FEAR >= 48*48'''
+
+        if greed(teseo.mosse)*fear(teseo.mosse) >= 48*50:
+            break
+
         if n == ngen-1:
             contatore = 1
 
@@ -513,6 +529,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
     ambiente = [[0 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)] #preparo il labirinto
 
     #bordi
+    '''
     ambiente[2][1] = 2 #tappo labirinto
     ambiente[2][2] = 2
     ambiente[2][0] = 2
@@ -531,26 +548,60 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
     #ripieno di torte
     ambiente[4][1] = 1
-    ambiente[5][1] = 1
+    ambiente[5][1] = 1'''
 
+    '''modifiche'''
 
-    
+    ambiente = [[2 for i in range(0, NGRIGLIA)] for n in range(0, NGRIGLIA)]
+    for i in range(1,14):
+        ambiente[i][1]=1
+        ambiente[13][i]=1
+        ambiente[i][13]=1
+    ambiente[1][1]=0
+    for i in range(3,14):
+        ambiente[1][i]=1
+    for i in range(0,10):
+        ambiente[i+2][3]=1
+    for i in range(0,8):
+        ambiente[11][i+4]=1
+    for i in range(0,8):
+        ambiente[i+3][11]=1
+    for i in range(0,6):
+        ambiente[3][i+5]=1
+        ambiente[i+4][5]=1
+    for i in range(0,4):
+        ambiente[9][i+6]=1
+        ambiente[i+5][9]=1
+    ambiente[5][7]=1
+    ambiente[5][8]=1
+    ambiente[6][7]=1
+    ambiente[7][7]=1
+    ambiente[7][8]=1    
     #ho scelto teseo come creatura campione, lo metto nel labirinto, non mi interessa della sua energia
-    teseo.x = 3     #inizio del labirinto
+    teseo.x = 1     #inizio del labirinto
     teseo.y = 1
 
     len_lab = 6 #lunghezz del labirinto
     fig, ax = plt.subplots() #materiale per plot
     listaTeseo = [teseo]
     plot_creature(listaTeseo, ambiente, ax)
-    for _ in range(6):
-        movimento_labirinto(listaTeseo[0], ambiente)
-        plt.pause(1) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+    for _ in range(1000):
+        if teseo.energia>0:
+            movimento_labirinto(listaTeseo[0], ambiente)
+            plt.pause(.3) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
-        plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
+            plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
-        plot_creature(listaTeseo, ambiente, ax)
+            plot_creature(listaTeseo, ambiente, ax)
+        else:
+            plt.pause(.3) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+
+            plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
+
+            plot_creature(listaTeseo, ambiente, ax)
         
+            quit()
+    
 
 
 
@@ -575,4 +626,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 20, mut_prob=0.2, ngen=1000, cut_crss= CUT_CRSS, ntorte= 100, grafici= False, scritte = True)
+    main(npop= 80, mut_prob=0.2, ngen=1000, cut_crss= CUT_CRSS, ntorte= 200, grafici= False, scritte = True)
