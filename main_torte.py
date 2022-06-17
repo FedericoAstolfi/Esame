@@ -23,14 +23,10 @@ else:
 
 CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
 NTORTE = 60
-NVELENO = 60
+NVELENO = 150
 ENERGIA = 10
-NGRIGLIA = 15
-<<<<<<< Updated upstream
-NMOSSE = 5
-=======
+NGRIGLIA = 20
 NMOSSE = 4
->>>>>>> Stashed changes
 
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 
