@@ -23,10 +23,10 @@ else:
 
 CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
 NTORTE = 60
-NVELENO = 125
-ENERGIA = 30
+NVELENO = 90
+ENERGIA = 10
 NGRIGLIA = 20
-NMOSSE = 3
+NMOSSE = 4
 
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 
@@ -71,7 +71,7 @@ class Creature():
         c = Creature(mosse_figlio)
         #arrotondo per eccesso l'energia del figlio
         a = round(((self.energia + other.energia)*0.5)+0.1)  # vista la natura del problema aggiungere 0.1 mi assicura di arrotondare per eccesso
-        c.energia = 10#int(a)  #converto in int per sicurezza
+        c.energia = int(a)  #converto in int per sicurezza
         return c    
 
 
@@ -498,19 +498,10 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
         
         #creature = [Creature(energia= int(media_energia)) for i in range(npop)] 
         
-        maxi= max([fear(c.mosse)*greed(c.mosse) for c in creature ])
-        max_ind = [fear(c.mosse)*greed(c.mosse) for c in creature].index(maxi)
-
-
-        if fear(teseo.mosse)*greed(teseo.mosse) < maxi:
-            teseo = creature[max_ind]
-        print(f"fear max: {fear(teseo.mosse)}")
-
-        '''SOLO PER IL CASO DEL LABIRINTO = BREAK SE GREED * FEAR >= 48*48'''
-
-        if greed(teseo.mosse)*fear(teseo.mosse) >= 48*50:
-            break
-
+        max_fear= max([fear(c.mosse) for c in creature ])
+        max_fear_ind = [fear(c.mosse) for c in creature].index(max_fear)
+        teseo = creature[max_fear_ind]
+        #print(f"fear max: {fear(teseo.mosse)}")
         if n == ngen-1:
             contatore = 1
 
