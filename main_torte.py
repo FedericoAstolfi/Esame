@@ -12,7 +12,7 @@ import itertools
 SIMBOLI = [2, 0, 1]     #rappresenteranno: prensenza di veleno, nulla, presenza di torta
 
 #al posto di mettere un parametro in più nel main, lo metto qui manualmente
-SWITCH_VELENO = True                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
+SWITCH_VELENO = False                #!!!!!!!!! interruttore !!!!!!!!!!!!!!!!
 
 if SWITCH_VELENO:
     LEN_GENOMA = 3**4
@@ -22,15 +22,11 @@ else:
     POSSIBILITA = [format(i, "04b") for i in range(0,16)]
 
 CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
-NTORTE = 60
+NTORTE = 69
 NVELENO = 60
 ENERGIA = 10
-NGRIGLIA = 15
-<<<<<<< Updated upstream
-NMOSSE = 5
-=======
-NMOSSE = 4
->>>>>>> Stashed changes
+NGRIGLIA = 10
+NMOSSE = 1
 
 '''come in self.mosse, ad esempio, 0101 significa: dx niente, su torta, sx niente, giu torta'''
 
@@ -403,7 +399,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
             if grafici:
 
-                plt.pause(.5) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+                plt.pause(.001) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
                 plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
@@ -464,7 +460,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
     
     #return media, greed_media, fear_media
-    return gen_media_energia, gen_media_greed, gen_media_fear
+    return gen_media_energia, gen_media_greed #, gen_media_fear
     
     #return 1 se è arrivato alla ngen generazione altrimenti 0
     #return contatore
@@ -482,4 +478,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 20, mut_prob=0.1, ngen=20, cut_crss= CUT_CRSS, ntorte= 69, grafici= True, scritte = True)
+    main(npop= 20, mut_prob=0.1, ngen=100, cut_crss= CUT_CRSS, ntorte= 69, grafici= False, scritte = True)
