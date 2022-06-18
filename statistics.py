@@ -25,22 +25,17 @@ def correlazione():
 
     '''studia correlazione tra energia e greed al viariare delle generazioni'''
 
-<<<<<<< Updated upstream
-    energia, greed, fear = main_torte.main(npop = 60, mut_prob = 0.1,\
-                         ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 150, grafici = False, scritte = False)
-=======
     energia, greed = main_torte.main(npop = 38, mut_prob = 0.1,\
-                         ngen = 1000, cut_crss = main_torte.CUT_CRSS, ntorte = 87, grafici = False, scritte = False)
->>>>>>> Stashed changes
+                         ngen = 200, cut_crss = main_torte.CUT_CRSS, ntorte = 87, grafici = False, scritte = False)
 
     #normalizzo entrambi i valori di modo che sia più facile vedere che relazione intercorre tra i due
     energy = copy.copy(energia)
     bonta = copy.copy(greed)
-    paura = copy.copy(fear)
+    #paura = copy.copy(fear)
     energia = [i/10 for i in energy]
-    greed = [i/65 for i in greed]
+    greed = [i/15 for i in greed]
     '''di solito fear lo tolgo'''
-    fear = [i/64 for i in paura]
+    #fear = [i/64 for i in paura]
 
     fig, ax = plt.subplots()
     ax.plot(range(1, len(energia)+1), energia, color ='r', label = 'energia')
@@ -48,8 +43,8 @@ def correlazione():
     ax.plot(range(1,len(greed)+1), greed, color = 'g', label = 'greed')
     ax.plot(range(1,len(greed)+1),[0.4]*(len(greed)),'b', label = 'media casuale greed')
     '''di solito fear lo tolgo'''
-    ax.plot(range(1,len(fear)+1),fear, color = 'orange', label = 'fear')
-    ax.plot(range(1,len(fear)+1), [0.59]*len(fear), color= 'pink', label = 'media casuale fear')
+    #ax.plot(range(1,len(fear)+1),fear, color = 'orange', label = 'fear')
+    #ax.plot(range(1,len(fear)+1), [0.59]*len(fear), color= 'pink', label = 'media casuale fear')
     ax.legend()
     plt.show()
 
