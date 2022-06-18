@@ -24,7 +24,7 @@ else:
 CUT_CRSS = int(LEN_GENOMA/2) #tengo il taglio in mezzo per non dimenticarmi (se taglio al 4 in un genoma da 81 probabilmente non avrò conv)
 NTORTE = 60
 NVELENO = 90
-ENERGIA = 10
+ENERGIA = 30
 NGRIGLIA = 20
 NMOSSE = 4
 
@@ -71,7 +71,7 @@ class Creature():
         c = Creature(mosse_figlio)
         #arrotondo per eccesso l'energia del figlio
         a = round(((self.energia + other.energia)*0.5)+0.1)  # vista la natura del problema aggiungere 0.1 mi assicura di arrotondare per eccesso
-        c.energia = int(a)  #converto in int per sicurezza
+        c.energia = 10# int(a)  #converto in int per sicurezza
         return c    
 
 
