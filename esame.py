@@ -1,3 +1,5 @@
+'''abbiamo deciso di settare diversi parametri come variabili globali di modo che fosse più semplice accedervi quando usate
+per definire function all'infuori del main'''
 
 from matplotlib import image
 import numpy as np
@@ -10,7 +12,7 @@ import itertools
 
 SIMBOLI = [2, 0, 1]         #rappresenteranno: presenza di veleno, nulla, presenza di torta
 
-SWITCH_VELENO = False       #interruttore: True implica presenza di veleni, False assenza
+SWITCH_VELENO = True       #interruttore: True implica presenza di veleni, False assenza
 
 if SWITCH_VELENO:
     LEN_GENOMA = 3**4
@@ -20,11 +22,11 @@ else:
     POSSIBILITA = [format(i, "04b") for i in range(0,16)]
 
 CUT_CRSS = int(LEN_GENOMA/2)
-NTORTE = 60
+NTORTE = 250
 NVELENO = 70
 ENERGIA = 10
 NGRIGLIA = 20
-NMOSSE = 4
+NMOSSE = 5
 
 '''0101 significa: dx niente, su torta, sx niente, giù torta
    2010 significa: dx veleno, su nulla, sx torta, giù nulla
@@ -34,7 +36,7 @@ NMOSSE = 4
 
 class Creature():
 
-    def __init__(self, dizionario = None, x=None, y=None, energia = ENERGIA  ):
+    def __init__(self, dizionario = None, x=None, y=None, energia = ENERGIA):
         ''' se non do niente genera delle mosse e delle posizioni casualmente con energia quella iniziale (e anche massima) '''
         if dizionario:
             self.mosse = dizionario
@@ -152,7 +154,7 @@ def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondent
 
 #scritte gestisce i print, di default è True
 #NON CONTROLLA che parents sia tutto nullo, lo facciamo nel main
-def get_offsprings(parents, npop, mut_prob, scritte): #lista di creature e prob di mutazione
+def get_offsprings(parents, npop, mut_prob): #lista di creature e prob di mutazione
     '''rimpiazzo tutte le creature con i figli di queste, cioè npop nuove creature.
         le creature figlie hanno come energia la media delle energie dei genitori arrotondata per eccesso.
         nel caso in cui tutte le creature abbiano energia 0, la popolazione si estingue:  lo segnalo.
@@ -278,34 +280,29 @@ def fear(dict):
 
 # PROGRAMMA PRINCIPALE
 
-def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True, scritte = True):
+'''def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True, scritte = True):'''
 
-    #parser = argparse.ArgumentParser(description = "Istinto di sopravvivenza con algoritmi genetici")
-    #parser.add_argument('popsize', help= "Numero di creature", type=int)
-    #parser.add_argument('mut_prob', help= "Probabilità di mutazione", type=float)
-    #parser.add_argument('ngen', help= "Numero di generazioni", type=int)
-    #parser.add_argument('--no_plots', help="does not show plots", default=False, action='store_true')
-    #args = parser.parse_args()
+if __name__ == '__main__':
 
-    #print(args)
+    parser = argparse.ArgumentParser(description = "Istinto di sopravvivenza con algoritmi genetici")
+    parser.add_argument('popsize', help= "Numero di creature", type=int)
+    parser.add_argument('mut_prob', help= "Probabilità di mutazione", type=float)
+    parser.add_argument('ngen', help= "Numero di generazioni", type=int)
+    args = parser.parse_args()
 
-    #npop = args.popsize
-    #mut_prob = args.mut_prob
-    #ngen = args.ngen
+    print(args)
+
+    npop = args.popsize
+    mut_prob = args.mut_prob
+    ngen = args.ngen
+
+    grafici = True
 
     if grafici:
         fig, ax = plt.subplots() #creo la mia lista di plot
 
     #creo la prima e unica popolazione casuale
     creature = [Creature() for i in range(npop)] 
-
-    NTORTE = ntorte
-    CUT_CRSS = cut_crss
-
-    gen_media_greed = []  #questi voglio poi plottarli in STATISTICS per vedere eventuali correlazioni
-    gen_media_energia = []
-    gen_media_fear = []
-    contatore = 0
 
     for n in range(ngen): 
 
@@ -327,9 +324,6 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
             pos_veleno = random.sample(indici, min(NVELENO, NGRIGLIA**2 - NTORTE))
             for i in pos_veleno:
                 ambiente[i[0]][i[1]] = 2 #codice per il veleno
-       
-
-        media_energia_iniziale = sum([c.energia for c in creature]) / len(creature)
 
         """ci assicuriamo di dare +1 energia alle creature spawnate su una torta e -1 a quelle sul veleno"""
         #ciclo sulle creature e controllo se nelle coord c'è un 1 nella griglia ambiente
@@ -359,7 +353,7 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
             if grafici:
 
-                plt.pause(.5) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
+                plt.pause(.01) #questo aspetta un secondo prima di visualizzare lo step successivo nel grafico
 
                 plt.draw() #questo aggiorna il grafico con i nuovi dati di creatura e ambiente che sono stati modificati da movimento
 
@@ -371,46 +365,28 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
         media_energia = sum(energie) / len(creature)
         media_greed = sum([greed(c.mosse) for c in creature])/ len(creature) #media delle bontà di ogni creatura
         media_fear = sum([fear(c.mosse) for c in creature])/ len(creature)
-
-
-        if scritte:
-            print(f"energia, greed e fear medie, gen numero {n+1}:\
-                {round(media_energia,2), round(media_greed,2), round(media_fear,2)}")
+        
+        '''facciamo notare che se non c'è veleno, nel print seguente la fear media stampata rimane 0 di default'''
+        print(f"energia, greed e fear medie, gen numero {n+1}:\
+            {round(media_energia,2), round(media_greed,2), round(media_fear,2)}")
 
         '''generazione successiva EVOLUTIVA:''' 
         
         if sum([c.energia for c in creature])==0:
             print("estinzione")
             break
-        creature = get_offsprings(creature, npop, mut_prob, scritte) #commentando questa linea tolgo tutto lo sforzo darwiniano
+        creature = get_offsprings(creature, npop, mut_prob) #commentando questa linea tolgo tutto lo sforzo darwiniano
         #per come funziona get_offspring ora è una lista vuota se non c'è più vita, in questo caso termino
-
-        """generazione successiva CASUALE:
-            tenere il successivo blocco commentato, serve per apprezzare la differenza tra evoluzione che premia
-            i più adatti e evoluzione completamente casuale. Utile per discriminare i set di parametri troppo permissivi
-            (cioè quelli in cui anche un approccio casuale basterebbe).
-            Scelgo di dare a tutti i figli casuali addirittura l'energia del migliore dei genitori (altrimenti
-            hanno sempre energia 10 e non muoiono mai)"""
-        
-        #creature = [Creature(energia= int(media_energia)) for i in range(npop)] 
-        
 
         if n == ngen-1:
             contatore = 1
 
     '''abbiamo ngen generazioni, con la prima indicizzata dallo 0 e lultima indicizzata da ngen-1'''
 
-    
     if grafici:
         plt.show()
 
-    '''questa è lenergia dell'ultima generazione, quella che in realtà non abbiamo considerato'''
     media = sum([c.energia for c in creature])/len(creature)
     greed_media = sum([greed(c.mosse) for c in creature])/len(creature)
     fear_media = sum([fear(c.mosse) for c in creature])/len(creature)
 
-
-
-if __name__ == '__main__':
-
-    main(npop= 20, mut_prob=0.1, ngen=20, cut_crss= CUT_CRSS, ntorte= 69, grafici= True, scritte = True)
