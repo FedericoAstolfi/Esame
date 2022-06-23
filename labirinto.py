@@ -208,7 +208,7 @@ def roulette_sampling(list,fit): #lista di creature e lista di fit corrispondent
                 risultato = list[cum.index(i)]
                 return risultato
     else:
-        print("i fit sono tutti zero")
+        print("i fit sono tutti zaro")
 
 #scritte gestisce i print, di default è True
 #NON CONTROLLA che parents sia tutto nullo, lo facciamo nel main
@@ -569,10 +569,25 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
     ambiente[7][7]=1
     ambiente[7][8]=1    
     #ho scelto teseo come creatura campione, lo metto nel labirinto, non mi interessa della sua energia
-    teseo.x = 1     #inizio del labirinto
-    teseo.y = 1
 
     len_lab = 6 #lunghezz del labirinto
+    ###################################################
+
+    d = {i : random.randint(0, 3) for i in POSSIBILITA}
+    d['2221'] = 3
+    d['2021'] = 3
+    d['1022'] = 0
+    d['1202'] = 0
+    d['2102'] = 1
+    d['2120'] = 1
+    d['2210'] = 2
+    d['0212'] = 2
+
+    teseo = Creature(dizionario= d)
+    print(teseo.mosse)
+    ###################################################
+    teseo.x = 1     #inizio del labirinto
+    teseo.y = 1
     fig, ax = plt.subplots() #materiale per plot
     listaTeseo = [teseo]
     plot_creature(listaTeseo, ambiente, ax)
@@ -617,4 +632,4 @@ def main(npop, mut_prob, ngen, cut_crss = CUT_CRSS, ntorte = 60, grafici = True,
 
 if __name__ == '__main__':
 
-    main(npop= 80, mut_prob=0.2, ngen=1000, cut_crss= CUT_CRSS, ntorte= 200, grafici= False, scritte = True)
+    main(npop= 80, mut_prob=0.2, ngen=1, cut_crss= CUT_CRSS, ntorte= 200, grafici= False, scritte = True)
